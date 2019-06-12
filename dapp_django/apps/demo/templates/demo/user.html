@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block content %}
+  <p>cellphone: {{ user.cellphone }}</p>
+  <p>name: {{ user.name }}</p>
+  <p>newid: {{ user.newid }}</p>
+  <image src="{{ user.avatar }}"></image>
+  <a href="order">浏览商品</a>
+
+{% endblock %}

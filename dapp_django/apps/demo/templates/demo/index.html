@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block content %}
+  <button onclick="login()">使用NewPay登录</button>
+{% endblock %}
+
+{% block script %}
+  <script type="text/javascript">
+    function login() {
+        location.href = "/user/login";
+    }
+  </script>
+{% endblock %}

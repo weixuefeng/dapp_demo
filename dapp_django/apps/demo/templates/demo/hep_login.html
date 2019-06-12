@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block content %}
+  {% if not login %}
+    正在生成二维码...
+  {% else %}
+    <div id="qrcode"></div>
+  {% endif %}
+{% endblock %}
+
+{% block script %}
+<script type="text/javascript">
+   let qrContent = "hep://{{ login.dapp_id }}/?action={{ login.action }}&auth_hash={{ login.auth_hash }}";
+   console.log("qrContent:" + qrContent);
+   new QRCode(document.getElementById("qrcode"), qrContent);
+
+  let index = 0;
+  const interval = window.setInterval(loopQuery, 2000);
+  //loopQuery();
+  function loopQuery() {
+      var url = "/user/query";
+      $.ajax({
+          url: url,
+          async: true,
+          type: 'post',
+          dataType: "json",
+          data: {},
+          success: function (res) {
+              index = res.error_code;
+              if(index == 1) {
+                  window.clearInterval(interval);
+                  window.location.href = "/user";
+              }
+          }
+      });
+  }
+
+
+</script>
+{% endblock %}
