@@ -75,7 +75,7 @@ def request_pay(request):
     pay_model.save()
     order = {
         'uuid': pay_session_id,
-        'description': 'goods description',
+        'description': '你好',
         'price_currency': 'NEW',
         'total_price': '100',
         'order_number': order_number,
@@ -172,7 +172,7 @@ def request_proof(request):
                     'price': '12.2',
                     'price_currency': 'NEW',
                     'ordered_item': {
-                        'name': '芒果',
+                        'name': '你好',
                         'thing_type': 'product',
                         'thing_id': uuid.uuid4().hex,
                     },
@@ -207,6 +207,8 @@ def receive_proof(request):
     proof_model = ProofModel()
     proof_model.uuid = request.POST.get('uuid')
     proof_model.txid = request.POST.get('txid')
+    if not proof_model.txid:
+        proof_model.txid = uuid.uuid4().hex
     proof_model.save()
     login_model = LoginModel.objects.filter(login_id=proof_model.uuid).first()
     if login_model:

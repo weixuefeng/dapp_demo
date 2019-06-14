@@ -17,6 +17,7 @@ from dapp_django.hep_service import constant
 import hep_rest
 import datetime
 
+
 def hep_login(session_key):
     data = {'uuid': session_key,
             'action': constant.ACTION_LOGIN,
@@ -68,8 +69,8 @@ def hep_proof(params):
 def _get_params(data):
     base_params = _get_base_params()
     data.update(base_params)
-    sign_string = sign_hmac(data)
-    data['md5'] = generate_digest(sign_string, secret=config.HEP_SECRET)
+    sign_string = get_sign_string(data, "&")
+    data['dapp_signature'] = generate_digest(sign_string, secret=config.HEP_SECRET)
     signature = _sign_r1(sign_string, private_key=config.HEP_PRIVATE_KEY)
     print("signstring:\r\n" + sign_string)
     data['signature'] = signature
@@ -85,7 +86,8 @@ def _get_base_params():
               'ts': int(time.time()),
               'nonce': uuid.uuid4().hex,
               'os': 'web',
-              'language': 'zh'
+              'language': 'zh',
+              'dapp_signature_method': 'HMAC-MD5'
               }
     return params
 
@@ -119,7 +121,26 @@ def _adjust_sign_str(sign_str):
     return '0' * (64 - len(sign_str)) + sign_str
 
 
+def get_sign_string(data, joint):
+    ordered_data = collections.OrderedDict(sorted(data.items()))
+    sign_string = ''
+    sign_fields = ['dapp_signature', 'signature', 'sign_type', 'dapp_signature_method']
+    n = 0
+    for k, v in ordered_data.items():
+        if k in sign_fields:
+            continue
+        if n != 0:
+            sign_string += joint
+        n += 1
+        if isinstance(v, list) or isinstance(v, dict):
+            sign_string += u'%s=%s' % (k, json.dumps(v, sort_keys=True, separators=(',', ':'), ensure_ascii=False))
+        else:
+            sign_string += u'%s=%s' % (k, v)
+    return sign_string
+
+
 if __name__ == "__main__":
+    str = ''
     print(generate_digest("1"))
 
 
