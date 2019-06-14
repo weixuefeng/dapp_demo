@@ -10,12 +10,7 @@ from dapp_django.hep_service import services
 from dapp_django.utils import http
 from .models import LoginModel, HepProfileModel, PayModel, ProofModel
 
-LOGIN_ID = 'login_id'
-
-index = "11"
-login_session_id = "login_" + index
-pay_session_id = "pay_" + index
-proof_session_id = "proof_" + index
+import hep_rest
 
 
 def index(request):
@@ -24,6 +19,7 @@ def index(request):
 
 def request_login(request):
     try:
+        login_session_id = uuid.uuid4().hex
         session_id = login_session_id
         login_model = LoginModel()
         login_model.login_id = session_id
@@ -42,7 +38,7 @@ def request_login(request):
 
 
 def query_profile(request):
-    login_model = LoginModel.objects.filter(login_id=request.session['uuid']).first()
+    login_model = LoginModel.objects.filter(login_id=request.session.get('uuid')).first()
     if not login_model:
         return http.JsonErrorResponse(error_message="no login model")
     if login_model.status == codes.StatusCode.AVAILABLE.value:
@@ -72,6 +68,7 @@ def request_pay(request):
     order_number = request.POST.get('order_number')
     login_id = request.session['uuid']
     user = HepProfileModel.objects.filter(uuid=login_id).first()
+    pay_session_id = uuid.uuid4().hex
     request.session['pay_id'] = pay_session_id
     pay_model = LoginModel()
     pay_model.login_id = pay_session_id
@@ -132,7 +129,7 @@ def receive_pay(request):
 
 
 def query_pay(request):
-    pay_model = LoginModel.objects.filter(login_id=request.session['pay_id']).first()
+    pay_model = LoginModel.objects.filter(login_id=request.session.get('pay_id')).first()
     if not pay_model:
         return http.JsonErrorResponse(error_message="no login model")
     if pay_model.status == codes.StatusCode.AVAILABLE.value:
@@ -153,7 +150,7 @@ def show_place_order(request):
 
 
 def request_proof(request):
-    order_number = request.POST.get('order_number')
+    proof_session_id = uuid.uuid4().hex
     login_id = request.session['uuid']
     user = HepProfileModel.objects.filter(uuid=login_id).first()
     request.session['proof_id'] = proof_session_id
@@ -164,6 +161,7 @@ def request_proof(request):
     params = {
         'uuid': proof_session_id,
         'order': {
+            'proof_type': 'order',
             'description': 'goods description',
             'price_currency': 'NEW',
             'total_price': '100',
@@ -171,12 +169,12 @@ def request_proof(request):
             'order_items': [
                 {
                     'order_item_number': uuid.uuid4().hex,
+                    'price': '12.2',
+                    'price_currency': 'NEW',
                     'ordered_item': {
                         'name': '芒果',
-                        'type': 'product',
-                        'price': '12.2',
-                        'product_id': uuid.uuid4().hex,
-                        'service_id': uuid.uuid4().hex,
+                        'thing_type': 'product',
+                        'thing_id': uuid.uuid4().hex,
                     },
                     'order_item_quantity': 1
                 }
