@@ -66,6 +66,14 @@ def hep_proof(params):
     return res
 
 
+def sign_request_params(data):
+    base_params = _get_h5_base_params()
+    data.update(base_params)
+    sign_string = get_sign_string(data, "&")
+    data['signature'] = _sign_r1(sign_string, private_key=config.HEP_PRIVATE_KEY)
+    return data
+
+
 def _get_params(data):
     base_params = _get_base_params()
     data.update(base_params)
@@ -88,6 +96,17 @@ def _get_base_params():
               'os': 'web',
               'language': 'zh',
               'dapp_signature_method': 'HMAC-MD5'
+              }
+    return params
+
+
+def _get_h5_base_params():
+    params = {'dapp_id': config.HEP_ID,
+              'protocol': 'HEP',
+              'version': '1.0',
+              'ts': int(time.time()),
+              'nonce': uuid.uuid4().hex,
+              'sign_type': config.SIGN_TYPE,
               }
     return params
 

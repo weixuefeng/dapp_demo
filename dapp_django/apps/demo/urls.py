@@ -23,4 +23,9 @@ urlpatterns = [
     path('placeorder/', views.show_place_order, name="show_place_order"),
     path('request/proof/', views.request_proof, name="request_proof"),
     path('query/proof/', views.query_proof, name="query_proof"),
+
+    path('request/login/h5/', views.request_login_h5, name="request_login_h5"),
+    path('request/pay/h5/', views.request_pay_h5, name="request_pay_h5"),
+    path('request/proof/h5/', views.request_proof_h5, name="request_proof_h5"),
+
 ]

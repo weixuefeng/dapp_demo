@@ -25,6 +25,7 @@
           dataType: "json",
           data: {},
           success: function (res) {
+              console.log(JSON.stringify(res));
               index = res.error_code;
               if(index == 1) {
                   window.clearInterval(interval);

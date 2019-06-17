@@ -6,6 +6,7 @@
       <p>order number: {{ order.ordernumber }}</p>
       <p>order price: {{ order.total_price }}{{ order.price_currency }}</p>
       <button onclick="placeorder();">上链</button>
+      <button onclick="h5proof();">上链H5</button>
       <div id="proof-qrcode"></div>
     {% else %}
         <p>暂无商品</p>

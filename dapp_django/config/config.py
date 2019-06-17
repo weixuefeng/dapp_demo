@@ -6,10 +6,11 @@ __doc__ = ''
 import datetime
 
 
-HEP_KEY = "2b400ed8e5674c31a779475afb5ed1bb"
-HEP_SECRET = "3562de4eddba4a1485ffedb9d13eafa7"
-HEP_ID = "2178792d3eb04bf6b5dbba19e767e38b"
-
+HEP_KEY = "b9cf6e95580e4490b6bc40f1536ac14d"
+HEP_SECRET = "d9e374eaaf034a14a0626ccbf2b95ccc"
+HEP_ID = "aea56d8d6bda47d3ab655b7e2883285d"
+HEP_PROTOCOL = "HEP"
+HEP_PROTOCOL_VERSION = "1.0"
 _REST_API = "rest/v1/"
 _HEP_API_BASE_URL = "http://hep.newtonproject.dev.diynova.com/" + _REST_API
 # _HEP_API_BASE_URL = "http://127.0.0.1:5000"
