@@ -4,8 +4,7 @@ import sys
 
 from django.shortcuts import render
 import datetime
-import hep_rest_api
-from hep_rest_api import utils
+
 
 from dapp_django.config import codes
 from dapp_django.config import config
@@ -26,8 +25,8 @@ def request_login(request):
         login_model = LoginModel()
         login_model.login_id = session_id
         login_model.save()
-        res = services.hep_login(session_id)
-        login = {'auth_hash': res['auth_hash'],
+        auth_hash = services.hep_login(session_id)
+        login = {'auth_hash': auth_hash,
                  'dapp_id': config.HEP_ID,
                  'action': constant.ACTION_LOGIN,
                  'uuid': session_id
@@ -35,6 +34,7 @@ def request_login(request):
         request.session['uuid'] = session_id
         return render(request, "demo/hep_login.html", {'login': login})
     except Exception as e:
+        print("error")
         print(str(e))
         return http.JsonErrorResponse()
 
@@ -108,11 +108,11 @@ def request_pay(request):
         'customer': user.newid,
         'broker': user.newid,
     }
-    res = services.hep_pay(order)
+    pay_hash = services.hep_pay(order)
     pay_info = {
         'dapp_id': config.HEP_ID,
         'action': constant.ACTION_PAY,
-        'pay_hash': res['pay_hash']
+        'pay_hash': pay_hash
     }
     return http.JsonSuccessResponse(data=pay_info)
 
@@ -170,9 +170,6 @@ def receive_pay(request):
         body = json.loads(request.body)
         pay_model.uuid = body.get('uuid')
         pay_model.txid = body.get('txid')
-    if not pay_model.uuid:
-        pay_model.uuid = request.session.get('pay_id')
-        print("session pay id")
     pay_model.save()
     login_model = LoginModel.objects.filter(login_id=pay_model.uuid).first()
     if login_model:
@@ -237,11 +234,11 @@ def request_proof(request):
             'broker': user.newid,
         }
     }
-    res = services.hep_proof(params)
+    proof_hash = services.hep_proof(params)
     pay_info = {
         'dapp_id': config.HEP_ID,
         'action': constant.ACTION_PROOF_SUBMIT,
-        'proof_hash': res['proof_hash']
+        'proof_hash': proof_hash
     }
     return http.JsonSuccessResponse(data=pay_info)
 
@@ -311,8 +308,6 @@ def receive_proof(request):
         proof_model.txid = body.get('txid')
     if not proof_model.txid:
         proof_model.txid = uuid.uuid4().hex
-    if not proof_model.uuid:
-        proof_model.uuid = request.session.get('proof_id')
     proof_model.save()
     login_model = LoginModel.objects.filter(login_id=proof_model.uuid).first()
     if login_model:
@@ -337,45 +332,5 @@ def post_profile(request):
     return http.JsonSuccessResponse()
 
 
-def _get_api_client():
-    configuration = hep_rest_api.configuration()
-    configuration.host = constant.HEP_HOST
-    api_instance = hep_rest_api.RestApi(hep_rest_api.ApiClient(configuration))
-    return api_instance
 
-
-def _get_base_data():
-    dapp_id = constant.HEP_ID
-    dapp_key = constant.HEP_KEY
-    dapp_secret = constant.HEP_SECRET
-    protocol = constant.HEP_PROTOCOL
-    version = constant.HEP_PROTOCOL_VERSION
-    ts = datetime.datetime.now().timestamp()
-    nonce = uuid.uuid4().hex
-    os = sys.platform
-    language = 'en'
-    dapp_signature_method = 'HMAC-MD5'
-    dapp_signature = ''
-
-    data = {
-        'api_version': version,
-        'dapp_id': dapp_id,
-        'dapp_key': dapp_key,
-        'protocol': protocol,
-        'version': version,
-        'ts': ts,
-        'nonce': nonce,
-        'os': os,
-        'language': language,
-        'dapp_signature_method': dapp_signature_method
-    }
-    return data
-
-
-def _sign_data(data):
-    base_data = _get_base_data()
-    data.update(base_data)
-    dapp_signature = utils.sign_hmac(data, constant)
-    data['dapp_signature'] = dapp_signature
-    return data
 

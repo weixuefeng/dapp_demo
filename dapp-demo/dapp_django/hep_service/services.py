@@ -2,19 +2,18 @@
 __author__ = 'weixuefeng@lubangame.com'
 __version__ = '1.0'
 __doc__ = ''
-import collections
-import hashlib
+import datetime
 import json
-import time
 import uuid
+import sys
+import hep_rest_api
+from hep_rest_api import utils
+from hep_rest_api import models
 
 import requests
-from fastecdsa import ecdsa
-from sha3 import keccak_256
-
+from django.conf import settings
 from dapp_django.config import config
 from dapp_django.hep_service import constant
-import datetime
 
 
 def hep_login(session_key):
@@ -23,12 +22,13 @@ def hep_login(session_key):
             'scope': 2,
             'expired': int(datetime.datetime.now().timestamp()) + config.QR_CODE_EXPIRED,
             'memo': '1'}
-    params = _get_params(data)
-    print("params:" + str(params))
-    res = requests.post(config.HEP_LOGIN, data=params)
-    print(res.content)
-    res = json.loads(res.content)
-    return res
+    data = _sign_data(data)
+    api_client = _get_api_client()
+    if api_client:
+        auth_cache = models.AuthCacheRequest(**data)
+        res = api_client.rest_newnet_caches_auth_create(body=auth_cache, api_version="1")
+        return res.auth_hash
+    return None
 
 
 def hep_pay(params):
@@ -40,15 +40,17 @@ def hep_pay(params):
         'price_currency': params['price_currency'],
         'total_price': params['total_price'],
         'order_number': params['order_number'],
-        'seller': 'NEWID182XXX',
+        'seller': params['customer'],
         'customer': params['customer'],
-        'broker': 'NEWIDXXX',
+        'broker': params['customer'],
     }
-    params = _get_params(data)
-    res = requests.post(config.HEP_PAY, data=params)
-    print(res.content)
-    res = json.loads(res.content)
-    return res
+    data = _sign_data(data)
+    api_client = _get_api_client()
+    if api_client:
+        pay_cache = models.PayCacheRequest(**data)
+        res = api_client.rest_newnet_caches_pay_create(body=pay_cache, api_version="1")
+        return res.pay_hash
+    return None
 
 
 def hep_proof(params):
@@ -57,108 +59,71 @@ def hep_proof(params):
         'action': constant.ACTION_PROOF_SUBMIT,
         'uuid': params['uuid'],
     }
-    params = _get_params(data)
-    print("params:" + str(params))
-    res = requests.post(config.HEP_PLACE_ORDER, json=params)
-    res = json.loads(res.content)
-    print(res)
-    return res
+    data = _sign_data(data)
+    api_client = _get_api_client()
+    if api_client:
+        proof_cache = models.CreateProofRequest(**data)
+        res = api_client.rest_proofs_create(body=proof_cache, api_version="1")
+        return res.proof_hash
+    return None
 
 
-def sign_request_params(data):
-    base_params = _get_h5_base_params()
-    data.update(base_params)
-    sign_string = get_sign_string(data, "&")
-    data['signature'] = _sign_r1(sign_string, private_key=config.HEP_PRIVATE_KEY)
+def _get_api_client():
+    configuration = hep_rest_api.api_client.Configuration()
+    configuration.host = constant.HEP_HOST
+    api_instance = hep_rest_api.RestApi(hep_rest_api.ApiClient(configuration))
+    return api_instance
+
+
+def _get_base_data():
+    dapp_id = constant.HEP_ID
+    dapp_key = constant.HEP_KEY
+    dapp_secret = constant.HEP_SECRET
+    protocol = constant.HEP_PROTOCOL
+    version = constant.HEP_PROTOCOL_VERSION
+    ts = int(datetime.datetime.now().timestamp())
+    nonce = uuid.uuid4().hex
+    os = sys.platform
+    language = 'en'
+    dapp_signature_method = 'HMAC-MD5'
+    dapp_signature = ''
+
+    data = {
+        'dapp_id': dapp_id,
+        'dapp_key': dapp_key,
+        'protocol': protocol,
+        'version': version,
+        'ts': ts,
+        'nonce': nonce,
+        'os': os,
+        'language': language,
+        'dapp_signature_method': dapp_signature_method,
+        'sign_type': constant.SIGN_TYPE
+    }
     return data
 
 
-def _get_params(data):
-    base_params = _get_base_params()
-    data.update(base_params)
-    sign_string = get_sign_string(data, "&")
-    data['dapp_signature'] = generate_digest(sign_string, secret=config.HEP_SECRET)
-    signature = _sign_r1(sign_string, private_key=config.HEP_PRIVATE_KEY)
-    print("signstring:\r\n" + sign_string)
-    data['signature'] = signature
-    data['sign_type'] = config.SIGN_TYPE
-    return data
-
-
-def _get_base_params():
-    params = {'dapp_id': config.HEP_ID,
-              'dapp_key': config.HEP_KEY,
-              'protocol': 'HEP',
-              'version': '1.0',
-              'ts': int(time.time()),
-              'nonce': uuid.uuid4().hex,
-              'os': 'web',
-              'language': 'zh',
-              'dapp_signature_method': 'HMAC-MD5'
-              }
-    return params
-
-
-def _get_h5_base_params():
-    params = {'dapp_id': config.HEP_ID,
-              'protocol': 'HEP',
-              'version': '1.0',
-              'ts': int(time.time()),
-              'nonce': uuid.uuid4().hex,
-              'sign_type': config.SIGN_TYPE,
-              }
-    return params
-
-
-def sign_hmac(data, prefix='', join='&'):
-    data = collections.OrderedDict(sorted(data.items()))
-    sign_string = prefix
-    n = 0
-    for k, v in data.items():
-        if n != 0 and k != 'sign':
-            sign_string += join
-        n += 1
-        if k != 'sign':
-            sign_string += u'%s=%s' % (k, v)
-    return sign_string
-
-
-def generate_digest(data, secret):
-    return hashlib.md5((data + secret).encode('utf-8')).hexdigest()
-
-
-def _sign_r1(message, private_key='', hashfunc=keccak_256):
-    r, s = ecdsa.sign(message, int(private_key, 16), hashfunc=hashfunc)
-    res = '0x%s%s' % (_adjust_sign_str(str(hex(r))), _adjust_sign_str(str(hex(s))))
-    return res
-
-
-def _adjust_sign_str(sign_str):
-    if sign_str.startswith('0x'):
-        sign_str = sign_str.replace('0x', '')
-    return '0' * (64 - len(sign_str)) + sign_str
-
-
-def get_sign_string(data, joint):
-    ordered_data = collections.OrderedDict(sorted(data.items()))
-    sign_string = ''
-    sign_fields = ['dapp_signature', 'signature', 'sign_type', 'dapp_signature_method']
-    n = 0
-    for k, v in ordered_data.items():
-        if k in sign_fields:
-            continue
-        if n != 0:
-            sign_string += joint
-        n += 1
-        if isinstance(v, list) or isinstance(v, dict):
-            sign_string += u'%s=%s' % (k, json.dumps(v, sort_keys=True, separators=(',', ':'), ensure_ascii=False))
-        else:
-            sign_string += u'%s=%s' % (k, v)
-    return sign_string
+def _sign_data(data):
+    try:
+        base_data = _get_base_data()
+        data.update(base_data)
+        dapp_signature = utils.sign_hmac(data, constant.HEP_SECRET)
+        data['dapp_signature'] = dapp_signature
+        sign_string = utils.generate_signature_base_string(data, "&")
+        r, s = utils.sign_secp256r1(sign_string, settings.PRIVATE_KEY_PATH)
+        if r.startswith('0x'):
+            r = r.replace('0x', '')
+        if s.startswith('0x'):
+            s = s.replace('0x', '')
+        data['signature'] = '0x' + r + s
+        return data
+    except Exception as e:
+        print(e.args)
+        return None
 
 
 if __name__ == "__main__":
     str = ''
-    print(generate_digest("1"))
+
 
 
