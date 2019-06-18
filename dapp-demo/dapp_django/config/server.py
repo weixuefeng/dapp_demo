@@ -1,9 +1,3 @@
-# -*- coding:utf-8 -*-
-__author__ = 'weixuefeng@lubangame.com'
-__version__ = ''
-__doc__ = ''
-
-
 HEP_KEY = "2eb603961aba4bf28cee101384b18b68"
 HEP_SECRET = "60a0a51c47ae4c8c8656e4046b5bb394"
 HEP_ID = "41a9bd28e1324bd28566cbafa9a4e064"

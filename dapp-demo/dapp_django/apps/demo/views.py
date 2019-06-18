@@ -1,16 +1,13 @@
+import datetime
 import json
 import uuid
-import sys
-
-from django.shortcuts import render
-import datetime
-
 
 from dapp_django.config import codes
-from dapp_django.config import config
-from dapp_django.hep_service import constant
 from dapp_django.hep_service import services
 from dapp_django.utils import http
+from django.conf import settings
+from django.shortcuts import render
+
 from .models import LoginModel, HepProfileModel, PayModel, ProofModel
 
 
@@ -28,7 +25,7 @@ def request_login(request):
         auth_hash = services.hep_login(session_id)
         login = {'auth_hash': auth_hash,
                  'dapp_id': config.HEP_ID,
-                 'action': constant.ACTION_LOGIN,
+                 'action': settings.ACTION_LOGIN,
                  'uuid': session_id
                  }
         request.session['uuid'] = session_id
@@ -47,12 +44,12 @@ def request_login_h5(request):
         login_model.save()
         request.session['uuid'] = session_id
         params = {
-            'dapp_id': config.HEP_ID,
-            'protocol': config.HEP_PROTOCOL,
-            'version': config.HEP_PROTOCOL_VERSION,
+            'dapp_id': settings.HEP_ID,
+            'protocol': settings.HEP_PROTOCOL,
+            'version': settings.HEP_PROTOCOL_VERSION,
             'ts': int(datetime.datetime.now().timestamp()),
             'nonce': uuid.uuid4().hex,
-            'action': constant.ACTION_LOGIN,
+            'action': settings.ACTION_LOGIN,
             'scope': 2,
             'memo': "H5 Request Login"
         }
@@ -110,8 +107,8 @@ def request_pay(request):
     }
     pay_hash = services.hep_pay(order)
     pay_info = {
-        'dapp_id': config.HEP_ID,
-        'action': constant.ACTION_PAY,
+        'dapp_id': settings.HEP_ID,
+        'action': settings.ACTION_PAY,
         'pay_hash': pay_hash
     }
     return http.JsonSuccessResponse(data=pay_info)
@@ -134,7 +131,7 @@ def request_pay_h5(request):
         'seller': user.newid,
         'customer': user.newid,
         'broker': user.newid,
-        'action': constant.ACTION_PAY
+        'action': settings.ACTION_PAY
     }
     res = services.sign_request_params(order)
     return http.JsonSuccessResponse(data=res)
@@ -236,8 +233,8 @@ def request_proof(request):
     }
     proof_hash = services.hep_proof(params)
     pay_info = {
-        'dapp_id': config.HEP_ID,
-        'action': constant.ACTION_PROOF_SUBMIT,
+        'dapp_id': settings.HEP_ID,
+        'action': settings.ACTION_PROOF_SUBMIT,
         'proof_hash': proof_hash
     }
     return http.JsonSuccessResponse(data=pay_info)
@@ -280,7 +277,7 @@ def request_proof_h5(request):
     }
     res = services.hep_proof(params)
     data = {
-        'action': constant.ACTION_PROOF_SUBMIT,
+        'action': settings.ACTION_PROOF_SUBMIT,
         'proof_hash': res['proof_hash']
     }
     data = services.sign_request_params(data)

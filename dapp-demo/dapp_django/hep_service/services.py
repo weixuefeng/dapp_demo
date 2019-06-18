@@ -9,16 +9,15 @@ import sys
 import hep_rest_api
 from hep_rest_api import utils
 from hep_rest_api import models
-
+from django.conf import settings
 import requests
 from django.conf import settings
 from dapp_django.config import config
-from dapp_django.hep_service import constant
 
 
 def hep_login(session_key):
     data = {'uuid': session_key,
-            'action': constant.ACTION_LOGIN,
+            'action': settings.ACTION_LOGIN,
             'scope': 2,
             'expired': int(datetime.datetime.now().timestamp()) + config.QR_CODE_EXPIRED,
             'memo': '1'}
@@ -34,7 +33,7 @@ def hep_login(session_key):
 def hep_pay(params):
     data = {
         'uuid': params['uuid'],
-        'action': constant.ACTION_PAY,
+        'action': settings.ACTION_PAY,
         'expired': int(datetime.datetime.now().timestamp()) + config.QR_CODE_EXPIRED,
         'description': params['description'],
         'price_currency': params['price_currency'],
@@ -56,7 +55,7 @@ def hep_pay(params):
 def hep_proof(params):
     data = {
         'content': params['order'],
-        'action': constant.ACTION_PROOF_SUBMIT,
+        'action': settings.ACTION_PROOF_SUBMIT,
         'uuid': params['uuid'],
     }
     data = _sign_data(data)
@@ -70,17 +69,17 @@ def hep_proof(params):
 
 def _get_api_client():
     configuration = hep_rest_api.api_client.Configuration()
-    configuration.host = constant.HEP_HOST
+    configuration.host = settings.HEP_HOST
     api_instance = hep_rest_api.RestApi(hep_rest_api.ApiClient(configuration))
     return api_instance
 
 
 def _get_base_data():
-    dapp_id = constant.HEP_ID
-    dapp_key = constant.HEP_KEY
-    dapp_secret = constant.HEP_SECRET
-    protocol = constant.HEP_PROTOCOL
-    version = constant.HEP_PROTOCOL_VERSION
+    dapp_id = settings.HEP_ID
+    dapp_key = settings.HEP_KEY
+    dapp_secret = settings.HEP_SECRET
+    protocol = settings.HEP_PROTOCOL
+    version = settings.HEP_PROTOCOL_VERSION
     ts = int(datetime.datetime.now().timestamp())
     nonce = uuid.uuid4().hex
     os = sys.platform
@@ -98,7 +97,7 @@ def _get_base_data():
         'os': os,
         'language': language,
         'dapp_signature_method': dapp_signature_method,
-        'sign_type': constant.SIGN_TYPE
+        'sign_type': settings.SIGN_TYPE
     }
     return data
 
@@ -107,7 +106,7 @@ def _sign_data(data):
     try:
         base_data = _get_base_data()
         data.update(base_data)
-        dapp_signature = utils.sign_hmac(data, constant.HEP_SECRET)
+        dapp_signature = utils.sign_hmac(data, settings.HEP_SECRET)
         data['dapp_signature'] = dapp_signature
         sign_string = utils.generate_signature_base_string(data, "&")
         r, s = utils.sign_secp256r1(sign_string, settings.PRIVATE_KEY_PATH)
