@@ -7,7 +7,7 @@ from dapp_django.hep_service import services
 from dapp_django.utils import http
 from django.conf import settings
 from django.shortcuts import render
-
+from hep_rest_api import utils
 from .models import LoginModel, HepProfileModel, PayModel, ProofModel
 
 
@@ -272,10 +272,12 @@ def get_proof_hash(request):
         }
     }
     proof_hash = services.hep_proof(params)
-    pay_info = {
+    client_params = {
+        'action': settings.ACTION_PROOF_SUBMIT,
         'proof_hash': proof_hash
     }
-    return http.JsonSuccessResponse(data=pay_info)
+    client_params = _get_client_params(client_params)
+    return http.JsonSuccessResponse(data=client_params)
 
 
 def request_proof_h5(request):
@@ -371,8 +373,21 @@ def _get_client_params(data):
     params = {
         'dapp_id': settings.HEP_ID,
         'protocol': settings.HEP_PROTOCOL,
+        'version': settings.HEP_PROTOCOL_VERSION,
+        'ts': int(datetime.datetime.now().timestamp()),
+        'nonce': uuid.uuid4().hex,
+        'sign_type': settings.SIGN_TYPE,
     }
-    return None
+    data.update(params)
+    message = utils.generate_signature_base_string(data, "&")
+    print(message)
+    r, s = utils.sign_secp256r1(message, settings.PRIVATE_KEY_PATH)
+    if r.startswith('0x'):
+        r = r.replace('0x', '')
+    if s.startswith('0x'):
+        s = s.replace('0x', '')
+    data['signature'] = '0x' + r + s
+    return data
 
 
 
