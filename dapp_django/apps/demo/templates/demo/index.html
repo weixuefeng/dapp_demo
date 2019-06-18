@@ -2,7 +2,7 @@
 {% block content %}
   <button onclick="login()">使用NewPay登录</button>
 
-    <button onclick="h5login()">h5Login</button>
+  <button onclick="h5login()">h5Login</button>
 {% endblock %}
 
 {% block script %}
@@ -10,26 +10,5 @@
     function login() {
         location.href = "/user/login";
     }
-  let index = 0;
-  const interval = window.setInterval(loopQuery, 2000);
-  //loopQuery();
-  function loopQuery() {
-      var url = "/user/query";
-      $.ajax({
-          url: url,
-          async: true,
-          type: 'post',
-          dataType: "json",
-          data: {},
-          success: function (res) {
-              console.log(JSON.stringify(res));
-              index = res.error_code;
-              if(index == 1) {
-                  window.clearInterval(interval);
-                  window.location.href = "/user";
-              }
-          }
-      });
-  }
   </script>
 {% endblock %}

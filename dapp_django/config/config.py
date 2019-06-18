@@ -6,9 +6,9 @@ __doc__ = ''
 import datetime
 
 
-HEP_KEY = "b9cf6e95580e4490b6bc40f1536ac14d"
-HEP_SECRET = "d9e374eaaf034a14a0626ccbf2b95ccc"
-HEP_ID = "aea56d8d6bda47d3ab655b7e2883285d"
+HEP_KEY = "2eb603961aba4bf28cee101384b18b68"
+HEP_SECRET = "60a0a51c47ae4c8c8656e4046b5bb394"
+HEP_ID = "41a9bd28e1324bd28566cbafa9a4e064"
 HEP_PROTOCOL = "HEP"
 HEP_PROTOCOL_VERSION = "1.0"
 _REST_API = "rest/v1/"

@@ -14,7 +14,6 @@ from sha3 import keccak_256
 
 from dapp_django.config import config
 from dapp_django.hep_service import constant
-import hep_rest
 import datetime
 
 

@@ -28,4 +28,6 @@ urlpatterns = [
     path('request/pay/h5/', views.request_pay_h5, name="request_pay_h5"),
     path('request/proof/h5/', views.request_proof_h5, name="request_proof_h5"),
 
+    path('post/profile/', views.post_profile, name="post_profile"),
+
 ]

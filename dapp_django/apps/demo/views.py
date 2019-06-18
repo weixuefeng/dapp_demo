@@ -11,8 +11,6 @@ from dapp_django.hep_service import services
 from dapp_django.utils import http
 from .models import LoginModel, HepProfileModel, PayModel, ProofModel
 
-import hep_rest
-
 
 def index(request):
     return render(request, "demo/index.html")
@@ -103,9 +101,9 @@ def request_pay(request):
         'price_currency': 'NEW',
         'total_price': '100',
         'order_number': order_number,
-        'seller': 'SELLERNEWIDXXXX',
+        'seller': user.newid,
         'customer': user.newid,
-        'broker': 'BROKERNEWIDXXXX',
+        'broker': user.newid,
     }
     res = services.hep_pay(order)
     pay_info = {
@@ -130,9 +128,9 @@ def request_pay_h5(request):
         'price_currency': 'NEW',
         'total_price': '100',
         'order_number': order_number,
-        'seller': 'SELLERNEWIDXXXX',
+        'seller': user.newid,
         'customer': user.newid,
-        'broker': 'BROKERNEWIDXXXX',
+        'broker': user.newid,
         'action': constant.ACTION_PAY
     }
     res = services.sign_request_params(order)
@@ -231,9 +229,9 @@ def request_proof(request):
                     'order_item_quantity': 1
                 }
             ],
-            'seller': 'SELLERNEWIDXXXX',
+            'seller': user.newid,
             'customer': user.newid,
-            'broker': 'BROKERNEWIDXXXX',
+            'broker': user.newid,
         }
     }
     res = services.hep_proof(params)
@@ -275,9 +273,9 @@ def request_proof_h5(request):
                     'order_item_quantity': 1
                 }
             ],
-            'seller': 'SELLERNEWIDXXXX',
+            'seller': user.newid,
             'customer': user.newid,
-            'broker': 'BROKERNEWIDXXXX',
+            'broker': user.newid,
         }
     }
     res = services.hep_proof(params)
@@ -318,3 +316,20 @@ def receive_proof(request):
         login_model.status = codes.StatusCode.AVAILABLE.value
         login_model.save()
     return http.JsonSuccessResponse()
+
+
+def post_profile(request):
+    body = json.loads(request.body)
+    profile_model = HepProfileModel()
+    profile_model.uuid = uuid.uuid4().hex
+    profile_model.signature = body.get('signature')
+    profile = body.get('profile')
+    profile_model.newid = profile.get('newid')
+    profile_model.name = profile.get('name')
+    profile_model.avatar = profile.get('avatar')
+    profile_model.address = profile.get('address')
+    profile_model.cellphone = profile.get('cellphone')
+    profile_model.save()
+    request.session['uuid'] = profile_model.uuid
+    return http.JsonSuccessResponse()
+

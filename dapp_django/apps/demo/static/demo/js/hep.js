@@ -24,27 +24,18 @@ function connectWebViewJavascriptBridge(callback) {
 connectWebViewJavascriptBridge(function(bridge) {
     bridge.init(function(message, responseCallback) {
         console.log('JS got a message', message);
-        var data = {
-            'Javascript Responds': '测试中文!'
-        };
-        if (responseCallback) {
-            console.log('JS responding with', data);
-            responseCallback(data);
-        }
     });
     bridge.registerHandler(ON_PROFILE, function (data, responseCallback) {
-        if (responseCallback) {
-            let res = "onProfileSuccess";
-            responseCallback(res);
-        }
-        let url = "/receive/profile/";
+        let url = "/post/profile/";
         $.ajax({
             url: url,
             async: true,
             type: 'post',
             data: data,
             success: function (res) {
-                console.log(JSON.stringify(res));
+                if(res.error_code == 1) {
+                    window.location.href = "/user"
+                }
             }
         })
     });
@@ -59,7 +50,6 @@ connectWebViewJavascriptBridge(function(bridge) {
                 console.log(res);
             }
         })
-
     });
     bridge.registerHandler(ON_PROOF, function (data, responseCallback) {
         let url = "/receive/proof/";
