@@ -369,4 +369,11 @@ def _get_base_data():
         'language': language,
         'dapp_signature_method': dapp_signature_method
     }
+    return data
+
+
+def _sign_data(data):
+    base_data = _get_base_data()
+    data.update(base_data)
+    dapp_signature = utils.sign_hmac(data, constant)
 
