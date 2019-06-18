@@ -12,14 +12,13 @@ from hep_rest_api import models
 from django.conf import settings
 import requests
 from django.conf import settings
-from dapp_django.config import config
 
 
 def hep_login(session_key):
     data = {'uuid': session_key,
             'action': settings.ACTION_LOGIN,
             'scope': 2,
-            'expired': int(datetime.datetime.now().timestamp()) + config.QR_CODE_EXPIRED,
+            'expired': int(datetime.datetime.now().timestamp()) + settings.QR_CODE_EXPIRED,
             'memo': '1'}
     data = _sign_data(data)
     api_client = _get_api_client()
@@ -34,7 +33,7 @@ def hep_pay(params):
     data = {
         'uuid': params['uuid'],
         'action': settings.ACTION_PAY,
-        'expired': int(datetime.datetime.now().timestamp()) + config.QR_CODE_EXPIRED,
+        'expired': int(datetime.datetime.now().timestamp()) + settings.QR_CODE_EXPIRED,
         'description': params['description'],
         'price_currency': params['price_currency'],
         'total_price': params['total_price'],

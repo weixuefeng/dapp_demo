@@ -240,6 +240,44 @@ def request_proof(request):
     return http.JsonSuccessResponse(data=pay_info)
 
 
+def get_proof_hash(request):
+    newid = request.POST.get('newid')
+    if not newid:
+        body = json.loads(request.body)
+        newid = body.get('newid')
+    params = {
+        'uuid': uuid.uuid4().hex,
+        'order': {
+            'proof_type': 'order',
+            'description': 'goods description',
+            'price_currency': 'NEW',
+            'total_price': '100',
+            'order_number': uuid.uuid4().hex,
+            'order_items': [
+                {
+                    'order_item_number': uuid.uuid4().hex,
+                    'price': '12.2',
+                    'price_currency': 'NEW',
+                    'ordered_item': {
+                        'name': '你好',
+                        'thing_type': 'product',
+                        'thing_id': uuid.uuid4().hex,
+                    },
+                    'order_item_quantity': 1
+                }
+            ],
+            'seller': newid,
+            'customer': newid,
+            'broker': newid,
+        }
+    }
+    proof_hash = services.hep_proof(params)
+    pay_info = {
+        'proof_hash': proof_hash
+    }
+    return http.JsonSuccessResponse(data=pay_info)
+
+
 def request_proof_h5(request):
     proof_session_id = uuid.uuid4().hex
     login_id = request.session['uuid']
@@ -327,6 +365,14 @@ def post_profile(request):
     profile_model.save()
     request.session['uuid'] = profile_model.uuid
     return http.JsonSuccessResponse()
+
+
+def _get_client_params(data):
+    params = {
+        'dapp_id': settings.HEP_ID,
+        'protocol': settings.HEP_PROTOCOL,
+    }
+    return None
 
 
 
