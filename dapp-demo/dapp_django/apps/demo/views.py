@@ -24,7 +24,7 @@ def request_login(request):
         login_model.save()
         auth_hash = services.hep_login(session_id)
         login = {'auth_hash': auth_hash,
-                 'dapp_id': config.HEP_ID,
+                 'dapp_id': settings.HEP_ID,
                  'action': settings.ACTION_LOGIN,
                  'uuid': session_id
                  }
