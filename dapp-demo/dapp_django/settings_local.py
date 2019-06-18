@@ -4,4 +4,3 @@ __version__ = ''
 __doc__ = ''
 from .config.settings_label import *
 from .config.common_settings import *
-PRIVATE_KEY_PATH = "/Users/erhu/pony/priv"

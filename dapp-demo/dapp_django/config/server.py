@@ -21,3 +21,5 @@ QR_CODE_EXPIRED = 300  # second
 ACTION_LOGIN = "hep.auth.login"
 ACTION_PAY = "hep.pay.order"
 ACTION_PROOF_SUBMIT = "hep.proof.submit"
+PRIVATE_KEY_PATH = "/Users/erhu/pony/priv"
+
