@@ -1,8 +1,11 @@
 import json
 import uuid
+import sys
 
 from django.shortcuts import render
 import datetime
+import hep_rest_api
+from hep_rest_api import utils
 
 from dapp_django.config import codes
 from dapp_django.config import config
@@ -332,4 +335,38 @@ def post_profile(request):
     profile_model.save()
     request.session['uuid'] = profile_model.uuid
     return http.JsonSuccessResponse()
+
+
+def _get_api_client():
+    configuration = hep_rest_api.configuration()
+    configuration.host = constant.HEP_HOST
+    api_instance = hep_rest_api.RestApi(hep_rest_api.ApiClient(configuration))
+    return api_instance
+
+
+def _get_base_data():
+    dapp_id = constant.HEP_ID
+    dapp_key = constant.HEP_KEY
+    dapp_secret = constant.HEP_SECRET
+    protocol = constant.HEP_PROTOCOL
+    version = constant.HEP_PROTOCOL_VERSION
+    ts = datetime.datetime.now().timestamp()
+    nonce = uuid.uuid4().hex
+    os = sys.platform
+    language = 'en'
+    dapp_signature_method = 'HMAC-MD5'
+    dapp_signature = ''
+
+    data = {
+        'api_version': version,
+        'dapp_id': dapp_id,
+        'dapp_key': dapp_key,
+        'protocol': protocol,
+        'version': version,
+        'ts': ts,
+        'nonce': nonce,
+        'os': os,
+        'language': language,
+        'dapp_signature_method': dapp_signature_method
+    }
 
