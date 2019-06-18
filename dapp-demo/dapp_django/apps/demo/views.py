@@ -376,4 +376,6 @@ def _sign_data(data):
     base_data = _get_base_data()
     data.update(base_data)
     dapp_signature = utils.sign_hmac(data, constant)
+    data['dapp_signature'] = dapp_signature
+    return data
 
