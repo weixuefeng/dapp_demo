@@ -280,6 +280,35 @@ def get_proof_hash(request):
     return http.JsonSuccessResponse(data=client_params)
 
 
+def get_client_login(request):
+    login_params = {
+        'action': settings.ACTION_LOGIN,
+        'scope': 2,
+        'memo': 'Demo Request Login'
+    }
+    login_params = _get_client_params(login_params)
+    return http.JsonSuccessResponse(data=login_params)
+
+
+def get_client_pay(request):
+    newid = request.POST.get('newid')
+    if not newid:
+        body = json.loads(request.body)
+        newid = body.get('newid')
+    pay_params = {
+        'action': settings.ACTION_PAY,
+        'description': 'Pay description',
+        'price_currency': 'NEW',
+        'total_price': "1",
+        'order_number': uuid.uuid4().hex,
+        'seller': newid,
+        'customer': newid,
+        'broker': newid,
+    }
+    pay_params = _get_client_params(pay_params)
+    return http.JsonSuccessResponse(data=pay_params)
+
+
 def request_proof_h5(request):
     proof_session_id = uuid.uuid4().hex
     login_id = request.session['uuid']

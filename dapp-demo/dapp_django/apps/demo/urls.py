@@ -29,6 +29,9 @@ urlpatterns = [
     path('request/proof/h5/', views.request_proof_h5, name="request_proof_h5"),
 
     path('post/profile/', views.post_profile, name="post_profile"),
-    path('get/proof/', views.get_proof_hash, name="get_proof_hash"),
+
+    path('get/client/proof/', views.get_proof_hash, name="get_proof_hash"),
+    path('get/client/login/', views.get_client_login, name="get_client_login"),
+    path('get/client/pay/', views.get_client_pay, name="get_client_pay")
 
 ]
