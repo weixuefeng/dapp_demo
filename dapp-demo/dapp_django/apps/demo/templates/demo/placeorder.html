@@ -5,6 +5,7 @@
       <p>order name: {{ order.ordername }}</p>
       <p>order number: {{ order.ordernumber }}</p>
       <p>order price: {{ order.total_price }}{{ order.price_currency }}</p>
+      <p id="tip"></p>
       <button onclick="placeorder();">上链</button>
       <button onclick="h5proof();">上链H5</button>
       <div id="proof-qrcode"></div>
@@ -33,9 +34,7 @@
             if(res.error_code == 1) {
                 let result = res.result;
                 let qrContent = "hep://"+result.dapp_id + "/?" + "action=" + result.action + "&proof_hash=" + result.proof_hash;
-                console.log("qrContent:" + qrContent);
                 new QRCode(document.getElementById("proof-qrcode"), qrContent);
-
             }
         })
     }

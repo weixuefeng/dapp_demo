@@ -36,29 +36,6 @@ def request_login(request):
         return http.JsonErrorResponse()
 
 
-def request_login_h5(request):
-    try:
-        session_id = uuid.uuid4().hex
-        login_model = LoginModel()
-        login_model.login_id = session_id
-        login_model.save()
-        request.session['uuid'] = session_id
-        params = {
-            'dapp_id': settings.HEP_ID,
-            'protocol': settings.HEP_PROTOCOL,
-            'version': settings.HEP_PROTOCOL_VERSION,
-            'ts': int(datetime.datetime.now().timestamp()),
-            'nonce': uuid.uuid4().hex,
-            'action': settings.ACTION_LOGIN,
-            'scope': 2,
-            'memo': "H5 Request Login"
-        }
-        params = services.sign_request_params(params)
-        return http.JsonSuccessResponse(data=params)
-    except Exception as e:
-        return http.JsonErrorResponse()
-
-
 def query_profile(request):
     login_model = LoginModel.objects.filter(login_id=request.session.get('uuid')).first()
     if not login_model:
@@ -114,29 +91,6 @@ def request_pay(request):
     return http.JsonSuccessResponse(data=pay_info)
 
 
-def request_pay_h5(request):
-    order_number = request.POST.get('order_number')
-    login_id = request.session['uuid']
-    user = HepProfileModel.objects.filter(uuid=login_id).first()
-    pay_session_id = uuid.uuid4().hex
-    request.session['pay_id'] = pay_session_id
-    pay_model = LoginModel()
-    pay_model.login_id = pay_session_id
-    pay_model.save()
-    order = {
-        'description': '你好',
-        'price_currency': 'NEW',
-        'total_price': '100',
-        'order_number': order_number,
-        'seller': user.newid,
-        'customer': user.newid,
-        'broker': user.newid,
-        'action': settings.ACTION_PAY
-    }
-    res = services.sign_request_params(order)
-    return http.JsonSuccessResponse(data=res)
-
-
 def receive_profile(request):
     body = json.loads(request.body)
     profile_model = HepProfileModel()
@@ -160,12 +114,11 @@ def receive_profile(request):
 
 def receive_pay(request):
     pay_model = PayModel()
+    pay_model.uuid = request.session.get('pay_id')
     if request.POST:
-        pay_model.uuid = request.POST.get('uuid')
         pay_model.txid = request.POST.get('txid')
     else:
         body = json.loads(request.body)
-        pay_model.uuid = body.get('uuid')
         pay_model.txid = body.get('txid')
     pay_model.save()
     login_model = LoginModel.objects.filter(login_id=pay_model.uuid).first()
@@ -309,6 +262,41 @@ def get_client_pay(request):
     return http.JsonSuccessResponse(data=pay_params)
 
 
+def request_login_h5(request):
+    try:
+        login_params = {
+            'action': settings.ACTION_LOGIN,
+            'scope': 2,
+            'memo': 'Demo Request Login'
+        }
+        login_params = _get_client_params(login_params)
+        return http.JsonSuccessResponse(data=login_params)
+    except Exception as e:
+        print(str(e))
+        return http.JsonErrorResponse()
+
+
+def request_pay_h5(request):
+    login_id = request.session['uuid']
+    user = HepProfileModel.objects.filter(uuid=login_id).first()
+    newid = user.newid
+    if not newid:
+        body = json.loads(request.body)
+        newid = body.get('newid')
+    pay_params = {
+        'action': settings.ACTION_PAY,
+        'description': 'Pay description',
+        'price_currency': 'NEW',
+        'total_price': "1",
+        'order_number': uuid.uuid4().hex,
+        'seller': newid,
+        'customer': newid,
+        'broker': newid,
+    }
+    pay_params = _get_client_params(pay_params)
+    return http.JsonSuccessResponse(data=pay_params)
+
+
 def request_proof_h5(request):
     proof_session_id = uuid.uuid4().hex
     login_id = request.session['uuid']
@@ -344,13 +332,13 @@ def request_proof_h5(request):
             'broker': user.newid,
         }
     }
-    res = services.hep_proof(params)
-    data = {
+    proof_hash = services.hep_proof(params)
+    client_params = {
         'action': settings.ACTION_PROOF_SUBMIT,
-        'proof_hash': res['proof_hash']
+        'proof_hash': proof_hash
     }
-    data = services.sign_request_params(data)
-    return http.JsonSuccessResponse(data=data)
+    client_params = _get_client_params(client_params)
+    return http.JsonSuccessResponse(data=client_params)
 
 
 def query_proof(request):
@@ -365,15 +353,8 @@ def query_proof(request):
 
 def receive_proof(request):
     proof_model = ProofModel()
-    if request.POST:
-        proof_model.uuid = request.POST.get('uuid')
-        proof_model.txid = request.POST.get('txid')
-    else:
-        body = json.loads(request.body)
-        proof_model.uuid = body.get('uuid')
-        proof_model.txid = body.get('txid')
-    if not proof_model.txid:
-        proof_model.txid = uuid.uuid4().hex
+    proof_model.uuid = request.session.get('proof_id')
+    proof_model.txid = uuid.uuid4().hex
     proof_model.save()
     login_model = LoginModel.objects.filter(login_id=proof_model.uuid).first()
     if login_model:
@@ -415,6 +396,12 @@ def _get_client_params(data):
         r = r.replace('0x', '')
     if s.startswith('0x'):
         s = s.replace('0x', '')
+    if len(r) < 64:
+        x = 64 - len(r)
+        r = '0' * x + r
+    if len(s) < 64:
+        y = 64 - len(s)
+        s = '0' * y + s
     data['signature'] = '0x' + r + s
     return data
 

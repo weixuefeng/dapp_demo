@@ -41,11 +41,12 @@ connectWebViewJavascriptBridge(function(bridge) {
     });
     bridge.registerHandler(ON_PAY, function (data, responseCallback) {
         let url = "/receive/pay/";
+        console.log(window.sessionStorage.getItem('pay_id'));
         $.ajax({
             url: url,
             async: true,
             type: 'post',
-            data: {'txid': data},
+            data: {'txid': data, 'uuid': window.sessionStorage.getItem('pay_id')},
             success: function (res) {
                 console.log(res);
             }
@@ -60,6 +61,7 @@ connectWebViewJavascriptBridge(function(bridge) {
             data: data,
             success: function (res) {
                 console.log(res);
+                $('#tip').val("success")
             }
         })
     });
