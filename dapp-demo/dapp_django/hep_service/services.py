@@ -3,15 +3,13 @@ __author__ = 'weixuefeng@lubangame.com'
 __version__ = '1.0'
 __doc__ = ''
 import datetime
-import json
-import uuid
 import sys
+import uuid
+
 import hep_rest_api
-from hep_rest_api import utils
+from django.conf import settings
 from hep_rest_api import models
-from django.conf import settings
-import requests
-from django.conf import settings
+from hep_rest_api import utils
 
 
 def hep_login(session_key):
@@ -113,6 +111,12 @@ def _sign_data(data):
             r = r.replace('0x', '')
         if s.startswith('0x'):
             s = s.replace('0x', '')
+        if len(r) < 64:
+            x = 64 - len(r)
+            r = '0' * x + r
+        if len(s) < 64:
+            y = 64 - len(s)
+            s = '0' * y + s
         data['signature'] = '0x' + r + s
         return data
     except Exception as e:
