@@ -12,6 +12,7 @@ function connectWebViewJavascriptBridge(callback) {
     if (window.WebViewJavascriptBridge) {
         callback(WebViewJavascriptBridge)
     } else {
+        console.log("start init");
         document.addEventListener(
             'WebViewJavascriptBridgeReady'
             , function() {
@@ -23,6 +24,8 @@ function connectWebViewJavascriptBridge(callback) {
 }
 
 connectWebViewJavascriptBridge(function(bridge) {
+    console.log("init jsbridge");
+    console.log(JSON.stringify(bridge));
     bridge.init(function(message, responseCallback) {
         console.log('JS got a message', message);
     });
@@ -40,21 +43,24 @@ connectWebViewJavascriptBridge(function(bridge) {
             }
         })
     });
-    bridge.registerHandler(ON_PAY, function (data, responseCallback) {
+    bridge.registerHandler(ON_PAY, function (response, responseCallback) {
         let url = "/receive/pay/";
-        console.log(window.sessionStorage.getItem('pay_id'));
         $.ajax({
             url: url,
             async: true,
             type: 'post',
-            data: {'txid': data},
+            data: response,
             success: function (res) {
-                console.log(res);
+                console.log(JSON.stringify(res));
+                if(res.error_code == 1) {
+                    window.location.href = "/placeorder/"
+                }
             }
         })
     });
     bridge.registerHandler(ON_PROOF, function (data, responseCallback) {
         let url = "/receive/proof/";
+
         $.ajax({
             url: url,
             async: true,
@@ -74,7 +80,6 @@ connectWebViewJavascriptBridge(function(bridge) {
 
 function h5login() {
     let url = "/request/login/h5/";
-    console.log(navigator.userAgent);
     $.ajax({
         url: url,
         async: true,
@@ -82,7 +87,6 @@ function h5login() {
         success: function (res) {
             console.log(JSON.stringify(res));
             if(res.error_code == 1) {
-                console.log(res);
                 let params = res.result;
                 window.WebViewJavascriptBridge.callHandler(
                     REQUEST_PROFILE, params

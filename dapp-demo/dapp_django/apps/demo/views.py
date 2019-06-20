@@ -91,6 +91,33 @@ def request_pay(request):
     return http.JsonSuccessResponse(data=pay_info)
 
 
+def request_pay_h5(request):
+    login_id = request.session['uuid']
+    user = HepProfileModel.objects.filter(uuid=login_id).first()
+    newid = user.newid
+    pay_session_id = uuid.uuid4().hex
+    request.session['pay_id'] = pay_session_id
+    pay_model = LoginModel()
+    pay_model.login_id = pay_session_id
+    pay_model.save()
+    if not newid:
+        body = json.loads(request.body)
+        newid = body.get('newid')
+    pay_params = {
+        'uuid': pay_session_id,
+        'action': settings.ACTION_PAY,
+        'description': 'Pay description',
+        'price_currency': 'NEW',
+        'total_price': "1",
+        'order_number': uuid.uuid4().hex,
+        'seller': newid,
+        'customer': newid,
+        'broker': newid,
+    }
+    pay_params = _get_client_params(pay_params)
+    return http.JsonSuccessResponse(data=pay_params)
+
+
 def receive_profile(request):
     body = json.loads(request.body)
     profile_model = HepProfileModel()
@@ -98,12 +125,11 @@ def receive_profile(request):
     if not profile_model.uuid:
         profile_model.uuid = request.session.get('uuid')
     profile_model.signature = body.get('signature')
-    profile = body.get('profile')
-    profile_model.newid = profile.get('newid')
-    profile_model.name = profile.get('name')
-    profile_model.avatar = profile.get('avatar')
-    profile_model.address = profile.get('address')
-    profile_model.cellphone = profile.get('cellphone')
+    profile_model.newid = body.get('newid')
+    profile_model.name = body.get('name')
+    profile_model.avatar = body.get('avatar')
+    profile_model.address = body.get('address')
+    profile_model.cellphone = body.get('cellphone')
     profile_model.save()
     login_model = LoginModel.objects.filter(login_id=profile_model.uuid).first()
     if login_model:
@@ -114,11 +140,13 @@ def receive_profile(request):
 
 def receive_pay(request):
     pay_model = PayModel()
-    if request.POST:
-        pay_model.txid = request.POST.get('txid')
+    pay_model.txid = request.POST.get('txid')
+    if pay_model.txid:
+        print(request.POST)
         pay_model.uuid = request.POST.get('uuid')
     else:
         body = json.loads(request.body)
+        print(body)
         pay_model.txid = body.get('txid')
         pay_model.uuid = body.get('uuid')
     pay_model.save()
@@ -203,8 +231,13 @@ def get_proof_hash(request):
     if not newid:
         body = json.loads(request.body)
         newid = body.get('newid')
+    proof_session_id = uuid.uuid4().hex
+    request.session['proof_id'] = proof_session_id
+    login_model = LoginModel()
+    login_model.login_id = proof_session_id
+    login_model.save()
     params = {
-        'uuid': uuid.uuid4().hex,
+        'uuid': proof_session_id,
         'order': {
             'proof_type': 'order',
             'description': 'goods description',
@@ -232,7 +265,8 @@ def get_proof_hash(request):
     proof_hash = services.hep_proof(params)
     client_params = {
         'action': settings.ACTION_PROOF_SUBMIT,
-        'proof_hash': proof_hash
+        'proof_hash': proof_hash,
+        'uuid': proof_session_id
     }
     client_params = _get_client_params(client_params, os)
     return http.JsonSuccessResponse(data=client_params)
@@ -277,37 +311,21 @@ def get_client_pay(request):
 
 def request_login_h5(request):
     try:
+        login_session_id = uuid.uuid4().hex
+        request.session['uuid'] = login_session_id
+        login_model = LoginModel()
+        login_model.login_id = login_session_id
         login_params = {
             'action': settings.ACTION_LOGIN,
             'scope': 2,
-            'memo': 'Demo Request Login'
+            'memo': 'Demo Request Login',
+            'uuid': login_session_id,
         }
         login_params = _get_client_params(login_params)
         return http.JsonSuccessResponse(data=login_params)
     except Exception as e:
         print(str(e))
         return http.JsonErrorResponse()
-
-
-def request_pay_h5(request):
-    login_id = request.session['uuid']
-    user = HepProfileModel.objects.filter(uuid=login_id).first()
-    newid = user.newid
-    if not newid:
-        body = json.loads(request.body)
-        newid = body.get('newid')
-    pay_params = {
-        'action': settings.ACTION_PAY,
-        'description': 'Pay description',
-        'price_currency': 'NEW',
-        'total_price': "1",
-        'order_number': uuid.uuid4().hex,
-        'seller': newid,
-        'customer': newid,
-        'broker': newid,
-    }
-    pay_params = _get_client_params(pay_params)
-    return http.JsonSuccessResponse(data=pay_params)
 
 
 def request_proof_h5(request):
@@ -347,6 +365,7 @@ def request_proof_h5(request):
     }
     proof_hash = services.hep_proof(params)
     client_params = {
+        'uuid': proof_session_id,
         'action': settings.ACTION_PROOF_SUBMIT,
         'proof_hash': proof_hash
     }
@@ -384,12 +403,11 @@ def post_profile(request):
     profile_model = HepProfileModel()
     profile_model.uuid = uuid.uuid4().hex
     profile_model.signature = body.get('signature')
-    profile = body.get('profile')
-    profile_model.newid = profile.get('newid')
-    profile_model.name = profile.get('name')
-    profile_model.avatar = profile.get('avatar')
-    profile_model.address = profile.get('address')
-    profile_model.cellphone = profile.get('cellphone')
+    profile_model.newid = body.get('newid')
+    profile_model.name = body.get('name')
+    profile_model.avatar = body.get('avatar')
+    profile_model.address = body.get('address')
+    profile_model.cellphone = body.get('cellphone')
     profile_model.save()
     request.session['uuid'] = profile_model.uuid
     return http.JsonSuccessResponse()

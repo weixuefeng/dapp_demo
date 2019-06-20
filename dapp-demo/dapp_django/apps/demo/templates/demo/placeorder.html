@@ -16,7 +16,7 @@
 
 {% block script %}
 <script type="text/javascript">
-    checkAgent();
+    // checkAgent();
     $("#tip").hide();
     function checkAgent() {
         let agent = navigator.userAgent;
@@ -28,14 +28,13 @@
             $("#bt-proof-h5").hide();
         }
     }
-    let interval;
+    let interval = window.setInterval(loopQuery, 2000);
     function placeorder() {
         let orderId = "{{ order.ordernumber }}";
         let payUrl = "/request/proof/";
         let data = {'order_number': orderId};
         $.post(payUrl, data, function (res) {
             if(res.error_code == 1) {
-                interval = window.setInterval(loopQuery, 2000);
                 let result = res.result;
                 let qrContent = "hep://"+result.dapp_id + "/?" + "action=" + result.action + "&proof_hash=" + result.proof_hash;
                 new QRCode(document.getElementById("proof-qrcode"), qrContent);
