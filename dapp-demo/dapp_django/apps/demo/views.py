@@ -114,12 +114,13 @@ def receive_profile(request):
 
 def receive_pay(request):
     pay_model = PayModel()
-    pay_model.uuid = request.session.get('pay_id')
     if request.POST:
         pay_model.txid = request.POST.get('txid')
+        pay_model.uuid = request.POST.get('uuid')
     else:
         body = json.loads(request.body)
         pay_model.txid = body.get('txid')
+        pay_model.uuid = body.get('uuid')
     pay_model.save()
     login_model = LoginModel.objects.filter(login_id=pay_model.uuid).first()
     if login_model:
@@ -365,7 +366,10 @@ def query_proof(request):
 
 def receive_proof(request):
     proof_model = ProofModel()
-    proof_model.uuid = request.session.get('proof_id')
+    proof_model.uuid = request.POST.get('uuid')
+    if not proof_model.uuid:
+        body = json.loads(request.body)
+        proof_model.uuid = body.get('uuid')
     proof_model.txid = uuid.uuid4().hex
     proof_model.save()
     login_model = LoginModel.objects.filter(login_id=proof_model.uuid).first()

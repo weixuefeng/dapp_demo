@@ -46,7 +46,7 @@ connectWebViewJavascriptBridge(function(bridge) {
             url: url,
             async: true,
             type: 'post',
-            data: {'txid': data, 'uuid': window.sessionStorage.getItem('pay_id')},
+            data: {'txid': data},
             success: function (res) {
                 console.log(res);
             }
