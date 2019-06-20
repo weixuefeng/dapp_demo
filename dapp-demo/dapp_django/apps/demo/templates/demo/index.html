@@ -1,14 +1,25 @@
 {% extends "base.html" %}
 {% block content %}
-  <button onclick="login()">使用NewPay登录</button>
+  <button id="bt-login" onclick="login()">使用NewPay登录</button>
 
-  <button onclick="h5login()">h5Login</button>
+  <button id="bt-login-h5" onclick="h5login()">h5Login</button>
 {% endblock %}
 
 {% block script %}
   <script type="text/javascript">
+    checkAgent();
     function login() {
         location.href = "/user/login";
+    }
+    function checkAgent() {
+        let agent = navigator.userAgent;
+        if(agent === "NewPay") {
+            $("#bt-login").hide();
+            $("#bt-login-h5").show();
+        } else {
+            $("#bt-login").show();
+            $("#bt-login-h5").hide();
+        }
     }
   </script>
 {% endblock %}

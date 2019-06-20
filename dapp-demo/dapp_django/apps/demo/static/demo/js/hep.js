@@ -6,6 +6,7 @@ const ON_PROFILE = "onProfile";
 const ON_PAY = "onPay";
 const ON_PROOF = "onProof";
 const ON_ERROR = "onCallNewPayError";
+const NEWPAY_AGENT = "NewPay";
 
 function connectWebViewJavascriptBridge(callback) {
     if (window.WebViewJavascriptBridge) {
@@ -73,6 +74,7 @@ connectWebViewJavascriptBridge(function(bridge) {
 
 function h5login() {
     let url = "/request/login/h5/";
+    console.log(navigator.userAgent);
     $.ajax({
         url: url,
         async: true,

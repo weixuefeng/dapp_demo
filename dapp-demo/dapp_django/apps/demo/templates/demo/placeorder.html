@@ -5,9 +5,9 @@
       <p>order name: {{ order.ordername }}</p>
       <p>order number: {{ order.ordernumber }}</p>
       <p>order price: {{ order.total_price }}{{ order.price_currency }}</p>
-      <p id="tip"></p>
-      <button onclick="placeorder();">上链</button>
-      <button onclick="h5proof();">上链H5</button>
+      <p id="tip">上链成功</p>
+      <button id="bt-proof" onclick="placeorder();">上链</button>
+      <button id="bt-proof-h5" onclick="h5proof();">上链H5</button>
       <div id="proof-qrcode"></div>
     {% else %}
         <p>暂无商品</p>
@@ -15,23 +15,27 @@
 {% endblock %}
 
 {% block script %}
-  <script type="text/javascript">
-    function getProofHash() {
-        let newid = "NEWID1acGJchbdZy74f3dTQxfZd6kkztfxzUgLtUyTvUtU21U4RaS72XY";
-        let url = "/get/proof/";
-        let data = {"newid": newid};
-        $.post(url, data, function (res) {
-            if(res.error_code == 1) {
-                console.log(JSON.stringify(res.result));
-            }
-        })
+<script type="text/javascript">
+    checkAgent();
+    $("#tip").hide();
+    function checkAgent() {
+        let agent = navigator.userAgent;
+        if(agent === "NewPay") {
+            $("#bt-proof").hide();
+            $("#bt-proof-h5").show();
+        } else {
+            $("#bt-proof").show();
+            $("#bt-proof-h5").hide();
+        }
     }
+    let interval;
     function placeorder() {
         let orderId = "{{ order.ordernumber }}";
         let payUrl = "/request/proof/";
         let data = {'order_number': orderId};
         $.post(payUrl, data, function (res) {
             if(res.error_code == 1) {
+                interval = window.setInterval(loopQuery, 2000);
                 let result = res.result;
                 let qrContent = "hep://"+result.dapp_id + "/?" + "action=" + result.action + "&proof_hash=" + result.proof_hash;
                 new QRCode(document.getElementById("proof-qrcode"), qrContent);
@@ -40,8 +44,6 @@
     }
 
      let index = 0;
-     const interval = window.setInterval(loopQuery, 2000);
-     //loopQuery();
      function loopQuery() {
          var url = "/query/proof/";
          $.ajax({
@@ -54,7 +56,7 @@
                 index = res.error_code;
                 if(index == 1) {
                     window.clearInterval(interval);
-                    alert("proof success!");
+                    $("#tip").show();
                 }
             }
         });
