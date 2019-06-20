@@ -194,6 +194,10 @@ def request_proof(request):
 
 
 def get_proof_hash(request):
+    os = request.POST.get('os')
+    if not os:
+        body = json.loads(request.body)
+        os = body.get('os')
     newid = request.POST.get('newid')
     if not newid:
         body = json.loads(request.body)
@@ -229,21 +233,39 @@ def get_proof_hash(request):
         'action': settings.ACTION_PROOF_SUBMIT,
         'proof_hash': proof_hash
     }
-    client_params = _get_client_params(client_params)
+    if os == "android":
+        client_params = _get_client_params(client_params, settings.ANDROID_PRIVATE_KEY)
+    elif os == "ios":
+        client_params = _get_client_params(client_params, settings.IOS_PRIVATE_KEY)
+    else:
+        client_params = _get_client_params(client_params)
     return http.JsonSuccessResponse(data=client_params)
 
 
 def get_client_login(request):
+    os = request.POST.get('os')
+    if not os:
+        body = json.loads(request.body)
+        os = body.get('os')
     login_params = {
         'action': settings.ACTION_LOGIN,
         'scope': 2,
         'memo': 'Demo Request Login'
     }
-    login_params = _get_client_params(login_params)
+    if os == "android":
+        login_params = _get_client_params(login_params, settings.ANDROID_PRIVATE_KEY)
+    elif os == "ios":
+        login_params = _get_client_params(login_params, settings.IOS_PRIVATE_KEY)
+    else:
+        login_params = _get_client_params(login_params)
     return http.JsonSuccessResponse(data=login_params)
 
 
 def get_client_pay(request):
+    os = request.POST.get('os')
+    if not os:
+        body = json.loads(request.body)
+        os = body.get('os')
     newid = request.POST.get('newid')
     if not newid:
         body = json.loads(request.body)
@@ -258,7 +280,12 @@ def get_client_pay(request):
         'customer': newid,
         'broker': newid,
     }
-    pay_params = _get_client_params(pay_params)
+    if os == "android":
+        pay_params = _get_client_params(pay_params, settings.ANDROID_PRIVATE_KEY)
+    elif os == "ios":
+        pay_params = _get_client_params(pay_params, settings.IOS_PRIVATE_KEY)
+    else:
+        pay_params = _get_client_params(pay_params)
     return http.JsonSuccessResponse(data=pay_params)
 
 
@@ -379,7 +406,7 @@ def post_profile(request):
     return http.JsonSuccessResponse()
 
 
-def _get_client_params(data):
+def _get_client_params(data, private_key_path=settings.PRIVATE_KEY_PATH):
     params = {
         'dapp_id': settings.HEP_ID,
         'protocol': settings.HEP_PROTOCOL,
@@ -390,8 +417,7 @@ def _get_client_params(data):
     }
     data.update(params)
     message = utils.generate_signature_base_string(data, "&")
-    print(message)
-    r, s = utils.sign_secp256r1(message, settings.PRIVATE_KEY_PATH)
+    r, s = utils.sign_secp256r1(message, private_key_path)
     if r.startswith('0x'):
         r = r.replace('0x', '')
     if s.startswith('0x'):
