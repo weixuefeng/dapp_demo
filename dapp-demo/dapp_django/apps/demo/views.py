@@ -233,12 +233,7 @@ def get_proof_hash(request):
         'action': settings.ACTION_PROOF_SUBMIT,
         'proof_hash': proof_hash
     }
-    if os == "android":
-        client_params = _get_client_params(client_params, settings.ANDROID_PRIVATE_KEY)
-    elif os == "ios":
-        client_params = _get_client_params(client_params, settings.IOS_PRIVATE_KEY)
-    else:
-        client_params = _get_client_params(client_params)
+    client_params = _get_client_params(client_params, os)
     return http.JsonSuccessResponse(data=client_params)
 
 
@@ -252,12 +247,7 @@ def get_client_login(request):
         'scope': 2,
         'memo': 'Demo Request Login'
     }
-    if os == "android":
-        login_params = _get_client_params(login_params, settings.ANDROID_PRIVATE_KEY)
-    elif os == "ios":
-        login_params = _get_client_params(login_params, settings.IOS_PRIVATE_KEY)
-    else:
-        login_params = _get_client_params(login_params)
+    login_params = _get_client_params(login_params, os)
     return http.JsonSuccessResponse(data=login_params)
 
 
@@ -280,12 +270,7 @@ def get_client_pay(request):
         'customer': newid,
         'broker': newid,
     }
-    if os == "android":
-        pay_params = _get_client_params(pay_params, settings.ANDROID_PRIVATE_KEY)
-    elif os == "ios":
-        pay_params = _get_client_params(pay_params, settings.IOS_PRIVATE_KEY)
-    else:
-        pay_params = _get_client_params(pay_params)
+    pay_params = _get_client_params(pay_params, os)
     return http.JsonSuccessResponse(data=pay_params)
 
 
@@ -406,9 +391,18 @@ def post_profile(request):
     return http.JsonSuccessResponse()
 
 
-def _get_client_params(data, private_key_path=settings.PRIVATE_KEY_PATH):
+def _get_client_params(data, os=None):
+    if os == "android":
+        dapp_id = settings.DAPP_ID_ANDROID
+        private_key_path = settings.DAPP_ID_ANDROID_PRIVATE_PATH
+    elif os == "ios":
+        dapp_id = settings.DAPP_ID_IOS
+        private_key_path = settings.DAPP_ID_IOS_PRIVATE_PATH
+    else:
+        dapp_id = settings.HEP_ID
+        private_key_path = settings.PRIVATE_KEY_PATH
     params = {
-        'dapp_id': settings.HEP_ID,
+        'dapp_id': dapp_id,
         'protocol': settings.HEP_PROTOCOL,
         'version': settings.HEP_PROTOCOL_VERSION,
         'ts': int(datetime.datetime.now().timestamp()),
