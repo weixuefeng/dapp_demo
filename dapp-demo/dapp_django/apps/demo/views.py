@@ -280,7 +280,8 @@ def get_client_login(request):
     login_params = {
         'action': settings.ACTION_LOGIN,
         'scope': 2,
-        'memo': 'Demo Request Login'
+        'memo': 'Demo Request Login',
+        'uuid': uuid.uuid4().hex
     }
     login_params = _get_client_params(login_params, os)
     return http.JsonSuccessResponse(data=login_params)
