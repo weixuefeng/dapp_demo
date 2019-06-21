@@ -305,6 +305,7 @@ def get_client_pay(request):
         'seller': newid,
         'customer': newid,
         'broker': newid,
+        'uuid': uuid.uuid4().hex
     }
     pay_params = _get_client_params(pay_params, os)
     return http.JsonSuccessResponse(data=pay_params)
