@@ -11,7 +11,6 @@ from hep_rest_api import utils
 from hep_rest_api.scenarios.proof import OrderProof
 from .models import LoginModel, HepProfileModel, PayModel, ProofModel
 
-
 def index(request):
     return render(request, "demo/index.html")
 
@@ -222,43 +221,47 @@ def request_proof(request):
 
 
 def get_proof_hash(request):
-    os = request.POST.get('os')
-    if not os:
-        body = json.loads(request.body)
-        os = body.get('os')
-    newid = request.POST.get('newid')
-    if not newid:
-        body = json.loads(request.body)
-        newid = body.get('newid')
-    # todo: add proof field.
-    pay_model = PayModel.objects.first()
-    txid = pay_model.txid
-    proof_session_id = uuid.uuid4().hex
-    order_content = OrderProof(order_number=uuid.uuid4().hex,
-                               price_currency="NEW",
-                               total_price="100",
-                               seller=newid,
-                               customer=newid,
-                               broker=newid,
-                               description="description",
-                               chain_txid=txid)
-    order_content.add_order_item(
-        order_item_number=uuid.uuid4().hex,
-        order_item_quantity=1,
-        price="10",
-        price_currency="NEW",
-        thing_name="pingguo",
-        thing_id=uuid.uuid4().hex,
-        thing_type='product'
-    )
-    proof_hash = services.get_proof_hash(order_content.to_dict(), proof_session_id)
-    client_params = {
-        'action': settings.ACTION_PROOF_SUBMIT,
-        'proof_hash': proof_hash,
-        'uuid': proof_session_id
-    }
-    client_params = _get_client_params(client_params, os)
-    return http.JsonSuccessResponse(data=client_params)
+    try:
+        os = request.POST.get('os')
+        if not os:
+            body = json.loads(request.body)
+            os = body.get('os')
+        newid = request.POST.get('newid')
+        if not newid:
+            body = json.loads(request.body)
+            newid = body.get('newid')
+        # todo: add proof field.
+        pay_model = PayModel.objects.first()
+        txid = pay_model.txid
+        proof_session_id = uuid.uuid4().hex
+        order_content = OrderProof(order_number=uuid.uuid4().hex,
+                                   price_currency="NEW",
+                                   total_price="100",
+                                   seller=newid,
+                                   customer=newid,
+                                   broker=newid,
+                                   description="description",
+                                   chain_txid=txid)
+        order_content.add_order_item(
+            order_item_number=uuid.uuid4().hex,
+            order_item_quantity=1,
+            price="10",
+            price_currency="NEW",
+            thing_name="pingguo",
+            thing_id=uuid.uuid4().hex,
+            thing_type='product'
+        )
+        proof_hash = services.get_proof_hash(order_content.to_dict(), proof_session_id)
+        client_params = {
+            'action': settings.ACTION_PROOF_SUBMIT,
+            'proof_hash': proof_hash,
+            'uuid': proof_session_id
+        }
+        client_params = _get_client_params(client_params, os)
+        return http.JsonSuccessResponse(data=client_params)
+    except Exception as e:
+        print(str(e))
+        return http.JsonErrorResponse(error_message=str(e))
 
 
 def get_client_login(request):
