@@ -230,22 +230,16 @@ def get_proof_hash(request):
     if not newid:
         body = json.loads(request.body)
         newid = body.get('newid')
-    proof_session_id = uuid.uuid4().hex
-    login_id = request.session['uuid']
-    user = HepProfileModel.objects.filter(uuid=login_id).first()
-    request.session['proof_id'] = proof_session_id
-    login_model = LoginModel()
-    login_model.login_id = proof_session_id
-    login_model.save()
     # todo: add proof field.
     pay_model = PayModel.objects.first()
     txid = pay_model.txid
+    proof_session_id = uuid.uuid4().hex
     order_content = OrderProof(order_number=uuid.uuid4().hex,
                                price_currency="NEW",
                                total_price="100",
-                               seller=user.newid,
-                               customer=user.newid,
-                               broker=user.newid,
+                               seller=newid,
+                               customer=newid,
+                               broker=newid,
                                description="description",
                                chain_txid=txid)
     order_content.add_order_item(
