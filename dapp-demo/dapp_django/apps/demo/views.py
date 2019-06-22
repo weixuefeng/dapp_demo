@@ -231,37 +231,33 @@ def get_proof_hash(request):
         body = json.loads(request.body)
         newid = body.get('newid')
     proof_session_id = uuid.uuid4().hex
+    login_id = request.session['uuid']
+    user = HepProfileModel.objects.filter(uuid=login_id).first()
     request.session['proof_id'] = proof_session_id
     login_model = LoginModel()
     login_model.login_id = proof_session_id
     login_model.save()
-    params = {
-        'uuid': proof_session_id,
-        'order': {
-            'proof_type': 'order',
-            'description': 'goods description',
-            'price_currency': 'NEW',
-            'total_price': '100',
-            'order_number': uuid.uuid4().hex,
-            'order_items': [
-                {
-                    'order_item_number': uuid.uuid4().hex,
-                    'price': '12.2',
-                    'price_currency': 'NEW',
-                    'ordered_item': {
-                        'name': '你好',
-                        'thing_type': 'product',
-                        'thing_id': uuid.uuid4().hex,
-                    },
-                    'order_item_quantity': 1
-                }
-            ],
-            'seller': newid,
-            'customer': newid,
-            'broker': newid,
-        }
-    }
-    proof_hash = services.hep_proof(params)
+    # todo: add proof field.
+    pay_model = PayModel.objects.first()
+    txid = pay_model.txid
+    order_content = OrderProof(order_number=uuid.uuid4().hex,
+                               price_currency="NEW",
+                               total_price="100",
+                               seller=user.newid,
+                               customer=user.newid,
+                               broker=user.newid,
+                               description="description",
+                               chain_txid=txid)
+    order_content.add_order_item(
+        order_item_number=uuid.uuid4().hex,
+        order_item_quantity=1,
+        price="10",
+        price_currency="NEW",
+        thing_name="pingguo",
+        thing_id=uuid.uuid4().hex,
+        thing_type='product'
+    )
+    proof_hash = services.get_proof_hash(order_content.to_dict(), proof_session_id)
     client_params = {
         'action': settings.ACTION_PROOF_SUBMIT,
         'proof_hash': proof_hash,
@@ -338,33 +334,26 @@ def request_proof_h5(request):
     login_model.login_id = proof_session_id
     login_model.save()
     # todo: add proof field.
-    params = {
-        'uuid': proof_session_id,
-        'order': {
-            'proof_type': 'order',
-            'description': 'goods description',
-            'price_currency': 'NEW',
-            'total_price': '100',
-            'order_number': uuid.uuid4().hex,
-            'order_items': [
-                {
-                    'order_item_number': uuid.uuid4().hex,
-                    'price': '12.2',
-                    'price_currency': 'NEW',
-                    'ordered_item': {
-                        'name': '你好',
-                        'thing_type': 'product',
-                        'thing_id': uuid.uuid4().hex,
-                    },
-                    'order_item_quantity': 1
-                }
-            ],
-            'seller': user.newid,
-            'customer': user.newid,
-            'broker': user.newid,
-        }
-    }
-    proof_hash = services.hep_proof(params)
+    pay_model = PayModel.objects.first()
+    txid = pay_model.txid
+    order_content = OrderProof(order_number=uuid.uuid4().hex,
+                               price_currency="NEW",
+                               total_price="100",
+                               seller=user.newid,
+                               customer=user.newid,
+                               broker=user.newid,
+                               description="description",
+                               chain_txid=txid)
+    order_content.add_order_item(
+        order_item_number=uuid.uuid4().hex,
+        order_item_quantity=1,
+        price="10",
+        price_currency="NEW",
+        thing_name="pingguo",
+        thing_id=uuid.uuid4().hex,
+        thing_type='product'
+    )
+    proof_hash = services.get_proof_hash(order_content.to_dict(), proof_session_id)
     client_params = {
         'uuid': proof_session_id,
         'action': settings.ACTION_PROOF_SUBMIT,

@@ -105,6 +105,11 @@ def hep_proof(content, uuid):
     return proof_qr_str
 
 
+def get_proof_hash(content, uuid):
+    proof_response = _get_proof_helper().generate_proof_request(content, uuid=uuid)
+    return proof_response.proof_hash
+
+
 def verify_proof(data):
     is_valid = _get_proof_helper().validate_proof_callback(data)
     if is_valid:
