@@ -8,6 +8,7 @@ from dapp_django.utils import http
 from django.conf import settings
 from django.shortcuts import render
 from hep_rest_api import utils
+from hep_rest_api.scenarios.proof import OrderProof
 from .models import LoginModel, HepProfileModel, PayModel, ProofModel
 
 
@@ -22,10 +23,8 @@ def request_login(request):
         login_model = LoginModel()
         login_model.login_id = session_id
         login_model.save()
-        auth_hash = services.hep_login(session_id)
-        login = {'auth_hash': auth_hash,
-                 'dapp_id': settings.HEP_ID,
-                 'action': settings.ACTION_LOGIN,
+        qr_code_str = services.hep_login(session_id)
+        login = {'qr_str': qr_code_str,
                  'uuid': session_id
                  }
         request.session['uuid'] = session_id
@@ -82,11 +81,9 @@ def request_pay(request):
         'customer': user.newid,
         'broker': user.newid,
     }
-    pay_hash = services.hep_pay(order)
+    pay_qr_str = services.hep_pay(order)
     pay_info = {
-        'dapp_id': settings.HEP_ID,
-        'action': settings.ACTION_PAY,
-        'pay_hash': pay_hash
+        'pay_qr_str': pay_qr_str
     }
     return http.JsonSuccessResponse(data=pay_info)
 
@@ -120,38 +117,48 @@ def request_pay_h5(request):
 
 def receive_profile(request):
     body = json.loads(request.body)
-    profile_model = HepProfileModel()
-    profile_model.uuid = body.get('uuid')
-    if not profile_model.uuid:
-        profile_model.uuid = request.session.get('uuid')
-    profile_model.signature = body.get('signature')
-    profile_model.newid = body.get('newid')
-    profile_model.name = body.get('name')
-    profile_model.avatar = body.get('avatar')
-    profile_model.address = body.get('address')
-    profile_model.cellphone = body.get('cellphone')
-    profile_model.save()
-    login_model = LoginModel.objects.filter(login_id=profile_model.uuid).first()
-    if login_model:
-        login_model.status = codes.StatusCode.AVAILABLE.value
-        login_model.save()
-    return http.JsonSuccessResponse(data=request.POST)
+    is_valid = services.verify_profile(body)
+    if is_valid:
+        profile_model = HepProfileModel()
+        profile_model.uuid = body.get('uuid')
+        if not profile_model.uuid:
+            profile_model.uuid = request.session.get('uuid')
+        profile_model.signature = body.get('signature')
+        profile_model.newid = body.get('newid')
+        profile_model.name = body.get('name')
+        profile_model.avatar = body.get('avatar')
+        profile_model.address = body.get('address')
+        profile_model.cellphone = body.get('cellphone')
+        if not profile_model.cellphone:
+            profile_model.cellphone = "scope is 1,no cellphone"
+        if not profile_model.address:
+            profile_model.address = "scope is 1,no address"
+        profile_model.save()
+        login_model = LoginModel.objects.filter(login_id=profile_model.uuid).first()
+        if login_model:
+            login_model.status = codes.StatusCode.AVAILABLE.value
+            login_model.save()
+        return http.JsonSuccessResponse(data=request.POST)
+    else:
+        return http.JsonErrorResponse(error_message="invalidate profile information")
 
 
 def receive_pay(request):
     pay_model = PayModel()
     pay_model.txid = request.POST.get('txid')
     if pay_model.txid:
-        print(request.POST)
         pay_model.uuid = request.POST.get('uuid')
     else:
         body = json.loads(request.body)
-        print(body)
+        # verify pay need sleep 3 second
+        services.verify_pay(body)
         pay_model.txid = body.get('txid')
         pay_model.uuid = body.get('uuid')
     pay_model.save()
+    print("pay_id" + pay_model.uuid)
     login_model = LoginModel.objects.filter(login_id=pay_model.uuid).first()
     if login_model:
+        print("update status")
         login_model.status = codes.StatusCode.AVAILABLE.value
         login_model.save()
     return http.JsonSuccessResponse()
@@ -159,6 +166,7 @@ def receive_pay(request):
 
 def query_pay(request):
     pay_model = LoginModel.objects.filter(login_id=request.session.get('pay_id')).first()
+    print(request.session.get('pay_id'))
     if not pay_model:
         return http.JsonErrorResponse(error_message="no login model")
     if pay_model.status == codes.StatusCode.AVAILABLE.value:
@@ -187,37 +195,28 @@ def request_proof(request):
     login_model.login_id = proof_session_id
     login_model.save()
     # todo: add proof field.
-    params = {
-        'uuid': proof_session_id,
-        'order': {
-            'proof_type': 'order',
-            'description': 'goods description',
-            'price_currency': 'NEW',
-            'total_price': '100',
-            'order_number': uuid.uuid4().hex,
-            'order_items': [
-                {
-                    'order_item_number': uuid.uuid4().hex,
-                    'price': '12.2',
-                    'price_currency': 'NEW',
-                    'ordered_item': {
-                        'name': '你好',
-                        'thing_type': 'product',
-                        'thing_id': uuid.uuid4().hex,
-                    },
-                    'order_item_quantity': 1
-                }
-            ],
-            'seller': user.newid,
-            'customer': user.newid,
-            'broker': user.newid,
-        }
-    }
-    proof_hash = services.hep_proof(params)
+    pay_model = PayModel.objects.first()
+    txid = pay_model.txid
+    order_content = OrderProof(order_number=uuid.uuid4().hex,
+                               price_currency="NEW",
+                               total_price="100",
+                               seller=user.newid,
+                               customer=user.newid,
+                               broker=user.newid,
+                               description="description",
+                               chain_txid=txid)
+    order_content.add_order_item(
+        order_item_number=uuid.uuid4().hex,
+        order_item_quantity=1,
+        price="10",
+        price_currency="NEW",
+        thing_name="pingguo",
+        thing_id=uuid.uuid4().hex,
+        thing_type='product'
+    )
+    proof_qr_str = services.hep_proof(order_content.to_dict(), proof_session_id)
     pay_info = {
-        'dapp_id': settings.HEP_ID,
-        'action': settings.ACTION_PROOF_SUBMIT,
-        'proof_hash': proof_hash
+        'proof_qr_str': proof_qr_str,
     }
     return http.JsonSuccessResponse(data=pay_info)
 
@@ -390,6 +389,10 @@ def receive_proof(request):
     proof_model.uuid = request.POST.get('uuid')
     if not proof_model.uuid:
         body = json.loads(request.body)
+        proof_status = services.verify_proof(body)
+        if proof_status:
+            print(proof_status.proof_status)
+            print(proof_status.proof_hash)
         proof_model.uuid = body.get('uuid')
     proof_model.txid = uuid.uuid4().hex
     proof_model.save()

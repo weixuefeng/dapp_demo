@@ -36,7 +36,7 @@
         $.post(payUrl, data, function (res) {
             if(res.error_code == 1) {
                 let result = res.result;
-                let qrContent = "hep://"+result.dapp_id + "/?" + "action=" + result.action + "&proof_hash=" + result.proof_hash;
+                let qrContent = result.proof_qr_str;
                 new QRCode(document.getElementById("proof-qrcode"), qrContent);
             }
         })

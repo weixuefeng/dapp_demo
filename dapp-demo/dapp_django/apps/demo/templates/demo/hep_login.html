@@ -9,7 +9,7 @@
 
 {% block script %}
 <script type="text/javascript">
-   let qrContent = "hep://{{ login.dapp_id }}/?action={{ login.action }}&auth_hash={{ login.auth_hash }}";
+   let qrContent = "{{ login.qr_str | safe }}";
    console.log("qrContent:" + qrContent);
    new QRCode(document.getElementById("qrcode"), qrContent);
 

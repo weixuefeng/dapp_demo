@@ -35,7 +35,7 @@
             if(res.error_code == 1) {
                 interval = window.setInterval(loopQuery, 2000);
                 let result = res.result;
-                let qrContent = "hep://"+result.dapp_id + "/?" + "action=" + result.action + "&pay_hash=" + result.pay_hash;
+                let qrContent = result.pay_qr_str;
                 console.log("qrContent:" + qrContent);
                 new QRCode(document.getElementById("pay-qrcode"), qrContent);
 
@@ -55,6 +55,7 @@
             data: {},
             success: function (res) {
                 index = res.error_code;
+                console.log(res.error_message);
                 if(index == 1) {
                     window.clearInterval(interval);
                     window.location.href = "/placeorder/";
