@@ -194,7 +194,7 @@ def request_proof(request):
     login_model.login_id = proof_session_id
     login_model.save()
     # todo: add proof field.
-    pay_model = PayModel.objects.first()
+    pay_model = PayModel.objects.last()
     txid = pay_model.txid
     order_content = OrderProof(order_number=uuid.uuid4().hex,
                                price_currency="NEW",
@@ -231,7 +231,7 @@ def get_proof_hash(request):
             body = json.loads(request.body)
             newid = body.get('newid')
         # todo: add proof field.
-        pay_model = PayModel.objects.first()
+        pay_model = PayModel.objects.last()
         txid = pay_model.txid
         proof_session_id = uuid.uuid4().hex
         order_content = OrderProof(order_number=uuid.uuid4().hex,
@@ -331,7 +331,7 @@ def request_proof_h5(request):
     login_model.login_id = proof_session_id
     login_model.save()
     # todo: add proof field.
-    pay_model = PayModel.objects.first()
+    pay_model = PayModel.objects.last()
     txid = pay_model.txid
     order_content = OrderProof(order_number=uuid.uuid4().hex,
                                price_currency="NEW",
