@@ -405,6 +405,7 @@ def post_profile(request):
         if data:
             request.POST = data
     body = request.POST
+    print(body)
     profile_model = HepProfileModel()
     profile_model.uuid = uuid.uuid4().hex
     profile_model.signature = body.get('signature')
