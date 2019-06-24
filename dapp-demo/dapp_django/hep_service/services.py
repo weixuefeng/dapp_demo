@@ -129,7 +129,7 @@ def hep_proof(content, uuid):
     return proof_qr_str
 
 
-def get_proof_hash(content, uuid, os):
+def get_proof_hash(content, uuid, os=None):
     if os == "android":
         proof_response = _get_proof_helper_android().generate_proof_request(content, uuid=uuid)
         return proof_response.proof_hash
