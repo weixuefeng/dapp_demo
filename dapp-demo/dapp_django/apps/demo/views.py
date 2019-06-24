@@ -115,7 +115,13 @@ def request_pay_h5(request):
 
 
 def receive_profile(request):
-    body = json.loads(request.body)
+    content_type = request.META.get('CONTENT_TYPE') or request.META.get['HTTP_CONTENT_TYPE']
+    if content_type.find('application/json') > -1:
+        data = json.loads(request.body)
+        if data:
+            request.POST = data
+    body = request.POST
+    print(body)
     is_valid = services.verify_profile(body)
     if is_valid:
         profile_model = HepProfileModel()
@@ -143,16 +149,15 @@ def receive_profile(request):
 
 
 def receive_pay(request):
+    content_type = request.META.get('CONTENT_TYPE') or request.META.get['HTTP_CONTENT_TYPE']
+    if content_type.find('application/json') > -1:
+        data = json.loads(request.body)
+        if data:
+            request.POST = data
+    body = request.POST
     pay_model = PayModel()
-    pay_model.txid = request.POST.get('txid')
-    if pay_model.txid:
-        pay_model.uuid = request.POST.get('uuid')
-    else:
-        body = json.loads(request.body)
-        # verify pay need sleep 3 second
-        services.verify_pay(body)
-        pay_model.txid = body.get('txid')
-        pay_model.uuid = body.get('uuid')
+    pay_model.txid = body.get('txid')
+    pay_model.uuid = body.get('uuid')
     pay_model.save()
     print("pay_id" + pay_model.uuid)
     login_model = LoginModel.objects.filter(login_id=pay_model.uuid).first()
@@ -371,15 +376,19 @@ def query_proof(request):
 
 
 def receive_proof(request):
+    content_type = request.META.get('CONTENT_TYPE') or request.META.get['HTTP_CONTENT_TYPE']
+    if content_type.find('application/json') > -1:
+        data = json.loads(request.body)
+        if data:
+            request.POST = data
+    body = request.POST
+
     proof_model = ProofModel()
-    proof_model.uuid = request.POST.get('uuid')
-    if not proof_model.uuid:
-        body = json.loads(request.body)
-        proof_status = services.verify_proof(body)
-        if proof_status:
-            print(proof_status.proof_status)
-            print(proof_status.proof_hash)
-        proof_model.uuid = body.get('uuid')
+    proof_model.uuid = body.get('uuid')
+    proof_status = services.verify_proof(body)
+    if proof_status:
+        print(proof_status.proof_status)
+        print(proof_status.proof_hash)
     proof_model.txid = uuid.uuid4().hex
     proof_model.save()
     login_model = LoginModel.objects.filter(login_id=proof_model.uuid).first()
