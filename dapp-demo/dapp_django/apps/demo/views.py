@@ -256,7 +256,7 @@ def get_proof_hash(request):
             thing_id=uuid.uuid4().hex,
             thing_type='product'
         )
-        proof_hash = services.get_proof_hash(order_content.to_dict(), proof_session_id)
+        proof_hash = services.get_proof_hash(order_content.to_dict(), proof_session_id, os)
         client_params = {
             'action': settings.ACTION_PROOF_SUBMIT,
             'proof_hash': proof_hash,

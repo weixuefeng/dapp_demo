@@ -24,6 +24,20 @@ base_parameters = {
     'os': sys.platform,
     'language': 'en'
 }
+base_parameters_android = {
+    'dapp_key': settings.DAPP_KEY_ANDROID,
+    'protocol': settings.HEP_PROTOCOL,
+    'version': settings.HEP_PROTOCOL_VERSION,
+    'os': sys.platform,
+    'language': 'en'
+}
+base_parameters_ios = {
+    'dapp_key': settings.DAPP_KEY_IOS,
+    'protocol': settings.HEP_PROTOCOL,
+    'version': settings.HEP_PROTOCOL_VERSION,
+    'os': sys.platform,
+    'language': 'en'
+}
 chain_id = 1002
 
 auth_helper = None
@@ -58,15 +72,25 @@ def _get_proof_helper():
     return ProofHelper(_get_api_client(), base_parameters, settings.HEP_ID, settings.HEP_SECRET, settings.PRIVATE_KEY_PATH, chain_id=chain_id)
 
 
+def _get_proof_helper_android():
+    if proof_helper:
+        return proof_helper
+    return ProofHelper(_get_api_client(), base_parameters_android, settings.DAPP_ID_ANDROID, settings.DAPP_SECRET_ANDROID, settings.DAPP_ID_ANDROID_PRIVATE_PATH, chain_id=chain_id)
+
+
+def _get_proof_helper_ios():
+    if proof_helper:
+        return proof_helper
+    return ProofHelper(_get_api_client(), base_parameters_ios, settings.DAPP_ID_IOS, settings.DAPP_SECRET_IOS, settings.DAPP_ID_IOS_PRIVATE_PATH, chain_id=chain_id)
+
+
 def hep_login(session_key):
     auth_response = _get_auth_helper().generate_auth_request(uuid=session_key)
     qr_code_str = _get_auth_helper().generate_qrcode_string(auth_response.auth_hash)
-    print(qr_code_str)
     return qr_code_str
 
 
 def verify_profile(data):
-    print(data)
     return _get_auth_helper().validate_auth_callback(data)
 
 
@@ -105,9 +129,16 @@ def hep_proof(content, uuid):
     return proof_qr_str
 
 
-def get_proof_hash(content, uuid):
-    proof_response = _get_proof_helper().generate_proof_request(content, uuid=uuid)
-    return proof_response.proof_hash
+def get_proof_hash(content, uuid, os):
+    if os == "android":
+        proof_response = _get_proof_helper_android().generate_proof_request(content, uuid=uuid)
+        return proof_response.proof_hash
+    elif os == "ios":
+        proof_response = _get_proof_helper_ios().generate_proof_request(content, uuid=uuid)
+        return proof_response.proof_hash
+    else:
+        proof_response = _get_proof_helper().generate_proof_request(content, uuid=uuid)
+        return proof_response.proof_hash
 
 
 def verify_proof(data):
