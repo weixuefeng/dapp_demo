@@ -400,7 +400,7 @@ def receive_proof(request):
 
 def post_profile(request):
     content_type = request.META.get('CONTENT_TYPE') or request.META.get['HTTP_CONTENT_TYPE']
-    if not request.POST and content_type.find('application/json') > -1:
+    if not request.POST.get('newid') and content_type.find('application/json') > -1:
         data = json.loads(request.body)
         if data:
             request.POST = data
