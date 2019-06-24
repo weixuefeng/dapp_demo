@@ -111,7 +111,7 @@ var bridge = {
 var dsBridge = bridge;
 dsBridge.registerAsyn(ON_PROFILE, function (profile) {
     let url = "/post/profile/";
-    console.log(JSON.stringify(profile));
+    alert(JSON.stringify(profile));
     $.ajax({
         url: url,
         async: true,
