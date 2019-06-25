@@ -197,13 +197,13 @@ def request_proof(request):
     pay_model = PayModel.objects.last()
     txid = pay_model.txid
     order_content = OrderProof(order_number=uuid.uuid4().hex,
-                               price_currency="NEW",
+                               price_currency="CNY",
                                total_price="100",
                                seller=user.newid,
                                customer=user.newid,
                                broker=user.newid,
                                description="description",
-                               chain_txid=txid)
+                               chain_txid=None)
     order_content.add_order_item(
         order_item_number=uuid.uuid4().hex,
         order_item_quantity=1,
