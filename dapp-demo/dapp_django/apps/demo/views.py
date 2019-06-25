@@ -143,7 +143,7 @@ def receive_profile(request):
         if login_model:
             login_model.status = codes.StatusCode.AVAILABLE.value
             login_model.save()
-        return http.JsonSuccessResponse(data=request.POST)
+        return http.HttpResponse("OK")
     else:
         return http.JsonErrorResponse(error_message="invalidate profile information")
 
@@ -390,7 +390,12 @@ def receive_proof(request):
 
 
 def post_profile(request):
-    body = json.loads(request.body)
+    content_type = request.META.get('CONTENT_TYPE') or request.META.get['HTTP_CONTENT_TYPE']
+    if content_type.find('application/json') > -1:
+        data = json.loads(request.body)
+        if data:
+            request.POST = data
+    body = request.POST
     print(body)
     profile_model = HepProfileModel()
     profile_model.uuid = uuid.uuid4().hex
