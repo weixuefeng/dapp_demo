@@ -111,18 +111,12 @@ var bridge = {
 var dsBridge = bridge;
 dsBridge.registerAsyn(ON_PROFILE, function (profile) {
     let url = "/post/profile/";
-    $.ajax({
-        url: url,
-        async: true,
-        type: 'post',
-        data: profile,
-        success: function (res) {
+    $.post(url, profile, function (res) {
             console.log(JSON.stringify(res));
             if(res.error_code == 1) {
                 window.location.href = "/user"
             }
-        }
-    })
+        }, "json")
 });
 dsBridge.registerAsyn(ON_PAY, function (pay_info) {
     let url = "/receive/pay/";
@@ -151,76 +145,6 @@ dsBridge.registerAsyn(ON_PROOF, function (proof_info) {
             $('#tip').val("success")
         }
     })
-});
-function connectWebViewJavascriptBridge(callback) {
-    if (window.WebViewJavascriptBridge) {
-        callback(WebViewJavascriptBridge)
-    } else {
-        console.log("start init");
-        document.addEventListener(
-            'WebViewJavascriptBridgeReady'
-            , function() {
-                callback(WebViewJavascriptBridge)
-            },
-            false
-        );
-    }
-}
-
-connectWebViewJavascriptBridge(function(bridge) {
-    console.log("init jsbridge");
-    console.log(JSON.stringify(bridge));
-    bridge.init(function(message, responseCallback) {
-        console.log('JS got a message', message);
-    });
-    bridge.registerHandler(ON_PROFILE, function (data, responseCallback) {
-
-        let url = "/post/profile/";
-        $.ajax({
-            url: url,
-            async: true,
-            type: 'post',
-            data: data,
-            success: function (res) {
-                if(res.error_code == 1) {
-                    window.location.href = "/user"
-                }
-            }
-        })
-    });
-    bridge.registerHandler(ON_PAY, function (response, responseCallback) {
-        let url = "/receive/pay/";
-        $.ajax({
-            url: url,
-            async: true,
-            type: 'post',
-            data: response,
-            success: function (res) {
-                console.log(JSON.stringify(res));
-                if(res.error_code == 1) {
-                    window.location.href = "/placeorder/"
-                }
-            }
-        })
-    });
-    bridge.registerHandler(ON_PROOF, function (data, responseCallback) {
-        let url = "/receive/proof/";
-
-        $.ajax({
-            url: url,
-            async: true,
-            type: 'post',
-            data: data,
-            success: function (res) {
-                console.log(res);
-                $('#tip').val("success")
-            }
-        })
-    });
-    bridge.registerHandler(ON_ERROR, function (data, responseCallback) {
-        console.log("on error:" + data);
-
-    });
 });
 
 function h5login() {

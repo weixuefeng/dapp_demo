@@ -149,7 +149,12 @@ def receive_profile(request):
 
 
 def receive_pay(request):
-    body = json.loads(request.body)
+    content_type = request.META.get('CONTENT_TYPE') or request.META.get['HTTP_CONTENT_TYPE']
+    if content_type.find('application/json') > -1:
+        data = json.loads(request.body)
+        if data:
+            request.POST = data
+    body = request.POST
     pay_model = PayModel()
     pay_model.txid = body.get('txid')
     pay_model.uuid = body.get('uuid')
@@ -371,9 +376,12 @@ def query_proof(request):
 
 
 def receive_proof(request):
-
-    body = json.loads(request.body)
-
+    content_type = request.META.get('CONTENT_TYPE') or request.META.get['HTTP_CONTENT_TYPE']
+    if content_type.find('application/json') > -1:
+        data = json.loads(request.body)
+        if data:
+            request.POST = data
+    body = request.POST
     proof_model = ProofModel()
     proof_model.uuid = body.get('uuid')
     proof_status = services.verify_proof(body)
@@ -390,13 +398,7 @@ def receive_proof(request):
 
 
 def post_profile(request):
-    content_type = request.META.get('CONTENT_TYPE') or request.META.get['HTTP_CONTENT_TYPE']
-    if content_type.find('application/json') > -1:
-        data = json.loads(request.body)
-        if data:
-            request.POST = data
     body = request.POST
-    print(body)
     profile_model = HepProfileModel()
     profile_model.uuid = uuid.uuid4().hex
     profile_model.signature = body.get('signature')
