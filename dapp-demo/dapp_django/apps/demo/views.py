@@ -162,7 +162,6 @@ def receive_pay(request):
     print("pay_id" + pay_model.uuid)
     login_model = LoginModel.objects.filter(login_id=pay_model.uuid).first()
     if login_model:
-        print("update status")
         login_model.status = codes.StatusCode.AVAILABLE.value
         login_model.save()
     return http.JsonSuccessResponse()
@@ -367,9 +366,11 @@ def request_proof_h5(request):
 
 def query_proof(request):
     proof_model = LoginModel.objects.filter(login_id=request.session.get('proof_id')).first()
+    print(proof_model)
     if not proof_model:
         return http.JsonErrorResponse(error_message="no login model")
     if proof_model.status == codes.StatusCode.AVAILABLE.value:
+        print(proof_model.login_id)
         return http.JsonSuccessResponse()
     else:
         return http.JsonErrorResponse(error_message="error status")
