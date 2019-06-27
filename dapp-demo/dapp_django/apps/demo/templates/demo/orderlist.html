@@ -18,7 +18,7 @@
    checkAgent();
    function checkAgent() {
         let agent = navigator.userAgent;
-        if(agent === "NewPay") {
+        if(agent.indexOf("NewPay") > -1) {
             $("#bt-buy").hide();
             $("#bt-buy-h5").show();
         } else {

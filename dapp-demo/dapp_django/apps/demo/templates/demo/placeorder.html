@@ -20,7 +20,7 @@
     $("#tip").hide();
     function checkAgent() {
         let agent = navigator.userAgent;
-        if(agent === "NewPay") {
+        if(agent.indexOf("NewPay") > -1) {
             $("#bt-proof").hide();
             $("#bt-proof-h5").show();
         } else {
