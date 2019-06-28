@@ -155,6 +155,8 @@ def receive_pay(request):
         if data:
             request.POST = data
     body = request.POST
+    print("pay info:")
+    print(body)
     pay_model = PayModel()
     pay_model.txid = body.get('txid')
     pay_model.uuid = body.get('uuid')
@@ -247,6 +249,7 @@ def get_proof_hash(request):
                                    broker=newid,
                                    description="description",
                                    chain_txid=txid)
+        print("txid:" + txid)
         order_content.add_order_item(
             order_item_number=uuid.uuid4().hex,
             order_item_quantity=1,
