@@ -13,13 +13,10 @@
     }
     function checkAgent() {
         let agent = navigator.userAgent;
-        alert(agent);
         if(agent.indexOf("NewPay") > -1) {
-            alert("show h5");
             $("#bt-login").hide();
             $("#bt-login-h5").show();
         } else {
-            alert("hide h5");
             $("#bt-login").show();
             $("#bt-login-h5").hide();
         }
