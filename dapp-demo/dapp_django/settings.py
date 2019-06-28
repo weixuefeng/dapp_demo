@@ -25,7 +25,7 @@ sys.path.insert(0, os.path.join(PROJECT_ROOT, "apps"))
 SECRET_KEY = '1s(8!$4y@5*95abmx!y+q^1s^bq_r7r5yhmbt07jtw9=(got*a'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = [
     '*',
@@ -76,6 +76,7 @@ WSGI_APPLICATION = 'dapp_django.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/2.2/ref/settings/#databases
+
 
 # Password validation
 # https://docs.djangoproject.com/en/2.2/ref/settings/#auth-password-validators
