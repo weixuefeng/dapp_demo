@@ -173,6 +173,7 @@ def query_pay(request):
     if not pay_model:
         return http.JsonErrorResponse(error_message="no login model")
     if pay_model.status == codes.StatusCode.AVAILABLE.value:
+        del request.session['pay_id']
         return http.JsonSuccessResponse()
     else:
         return http.JsonErrorResponse(error_message="error status")
@@ -370,7 +371,7 @@ def query_proof(request):
     if not proof_model:
         return http.JsonErrorResponse(error_message="no login model")
     if proof_model.status == codes.StatusCode.AVAILABLE.value:
-        print(proof_model.login_id)
+        del request.session['proof_id']
         return http.JsonSuccessResponse()
     else:
         return http.JsonErrorResponse(error_message="error status")
