@@ -1,0 +1,30 @@
+.container {
+    width: 1200px;
+    margin: 0 auto
+}
+.login-row, .login-h5-row {
+    margin-top: 200px;
+}
+.login-btn {
+    width: 100%;
+    height: 60px;
+    font-size: 20px;
+}
+#qrcode {
+    margin-top: 200px;
+}
+.scan-word {
+    margin-top: 20px;
+    font-size: 20px;
+}
+#qrcode img, #proof-qrcode img, #pay-qrcode img {
+    display: inline !important;
+}
+.order-head{
+    margin-top: 200px;
+}
+.word {
+    font-size: 20px;
+    margin-top: 30px;
+    margin-bottom: 30px;
+}

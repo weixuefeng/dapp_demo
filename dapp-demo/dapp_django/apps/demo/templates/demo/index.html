@@ -1,8 +1,19 @@
 {% extends "base.html" %}
 {% block content %}
-  <button id="bt-login" onclick="login()">使用NewPay登录</button>
+<div class="container">
+    <div class="row login-row" style="margin-top: 200px">
+        <div class="col-lg-offset-4 col-lg-4 col-md-offset-4 col-md-4 col-sm-offset-2 col-sm-8 col-xs-offset-2 col-xs-8 ">
+            <button id="bt-login" class="btn btn-primary btn-lg login-btn" onclick="login()">使用NewPay登录</button>
+        </div>
+    </div>
+    <div class="row login-h5-row" style="margin-top: 200px">
+        <div class="col-lg-offset-4 col-lg-4 col-md-offset-4 col-md-4 col-sm-offset-2 col-sm-8 col-xs-offset-2 col-xs-8">
+            <button id="bt-login-h5" class="btn btn-primary btn-lg login-btn" onclick="h5login()">h5Login</button>
+        </div>
+    </div>
+</div>
 
-  <button id="bt-login-h5" onclick="h5login()">h5Login</button>
+
 {% endblock %}
 
 {% block script %}
@@ -13,13 +24,10 @@
     }
     function checkAgent() {
         let agent = navigator.userAgent;
-        alert(agent);
         if(agent.indexOf("NewPay") > -1) {
-            alert("show h5");
             $("#bt-login").hide();
             $("#bt-login-h5").show();
         } else {
-            alert("hide h5");
             $("#bt-login").show();
             $("#bt-login-h5").hide();
         }

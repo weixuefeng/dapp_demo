@@ -1,9 +1,9 @@
 {% extends "base.html" %}
 {% block content %}
-  <p>cellphone: {{ user.cellphone }}</p>
-  <p>name: {{ user.name }}</p>
-  <p>newid: {{ user.newid }}</p>
-  <image src="{{ user.avatar }}"></image>
-  <a href="order">浏览商品</a>
+  <p class="order-head text-center word">cellphone: {{ user.cellphone }}</p>
+  <p class="text-center word">name: {{ user.name }}</p>
+  <p class="text-center word">newid: {{ user.newid }}</p>
+  <p class="text-center word "><img src="{{ user.avatar }}" style="width: 100%" /></p>
+  <p class="text-center word"><a class="text-center" href="order">浏览商品</a></p>
 
 {% endblock %}

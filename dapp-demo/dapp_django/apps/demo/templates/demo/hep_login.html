@@ -3,8 +3,11 @@
   {% if not login %}
     正在生成二维码...
   {% else %}
-    <div id="qrcode"></div>
+    <div id="qrcode" class="row text-center" style="margin-left: auto;margin-right: auto;"></div>
+    <div style="clear: both"></div>
+    <p class="text-center scan-word"> 请使用NewPay 1.3进行扫描</p>
   {% endif %}
+
 {% endblock %}
 
 {% block script %}

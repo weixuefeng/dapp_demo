@@ -7,17 +7,12 @@
   <script src="{% static 'demo/js/qrcode.min.js' %}"></script>
   <script src="{% static 'demo/js/jquery-2.1.4.min.js' %}"></script>
   <script src="{% static 'demo/js/hep.js' %}"></script>
+  <script src="{% static 'demo/js/bootstrap.min.js' %}"></script>
+  <link href="{% static 'demo/css/style.css' %}" rel="stylesheet" />
+  <link href="{% static 'demo/css/bootstrap.min.css' %}" rel="stylesheet" />
 </head>
 <body>
-  {% block header %}
-    {% include "header.html" %}
-  {% endblock %}
-
   {% block content %}
-  {% endblock %}
-
-  {% block footer %}
-    {% include "footer.html" %}
   {% endblock %}
 
   {% block script %}
