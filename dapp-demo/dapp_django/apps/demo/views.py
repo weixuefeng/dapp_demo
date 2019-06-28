@@ -143,13 +143,13 @@ def receive_profile(request):
             if data:
                 request.POST = data
         body = request.POST
-        print(body)
+        logger.info(body)
         is_valid = services.verify_profile(body)
         if is_valid:
             profile_model = HepProfileModel()
             profile_model.uuid = body.get('uuid')
             if not profile_model.uuid:
-                profile_model.uuid = request.session.get('uuid')
+                return http.JsonErrorResponse(error_message="no uuid")
             profile_model.signature = body.get('signature')
             profile_model.newid = body.get('newid')
             profile_model.name = body.get('name')
@@ -164,8 +164,11 @@ def receive_profile(request):
             login_model = LoginModel.objects.filter(login_id=profile_model.uuid).first()
             if login_model:
                 login_model.status = codes.StatusCode.AVAILABLE.value
+                logger.info("update profile info status")
                 login_model.save()
-            return http.HttpResponse("OK")
+                return http.HttpResponse("OK")
+            else:
+                return http.JsonErrorResponse(error_message="no login id")
         else:
             return http.JsonErrorResponse(error_message="invalidate profile information")
     except Exception as e:
