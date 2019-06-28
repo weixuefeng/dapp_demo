@@ -38,7 +38,7 @@ base_parameters_ios = {
     'os': sys.platform,
     'language': 'en'
 }
-chain_id = 1002
+chain_id = settings.CHAIN_ID
 
 auth_helper = None
 pay_helper = None

@@ -149,6 +149,7 @@ def receive_profile(request):
             profile_model = HepProfileModel()
             profile_model.uuid = body.get('uuid')
             if not profile_model.uuid:
+                logger.error("no uuid")
                 return http.JsonErrorResponse(error_message="no uuid")
             profile_model.signature = body.get('signature')
             profile_model.newid = body.get('newid')
@@ -168,8 +169,10 @@ def receive_profile(request):
                 login_model.save()
                 return http.HttpResponse("OK")
             else:
+                logger.error("no login id ")
                 return http.JsonErrorResponse(error_message="no login id")
         else:
+            logger.error("invalidate profile information")
             return http.JsonErrorResponse(error_message="invalidate profile information")
     except Exception as e:
         logger.exception("receive profile error:%s" % str(e))

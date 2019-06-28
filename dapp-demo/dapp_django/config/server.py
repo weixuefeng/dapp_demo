@@ -16,7 +16,7 @@ QR_CODE_EXPIRED = 300  # second
 ACTION_LOGIN = "hep.auth.login"
 ACTION_PAY = "hep.pay.order"
 ACTION_PROOF_SUBMIT = "hep.proof.submit"
-
+CHAIN_ID = 1002
 HEP_ID = "75098291f88343b9836118546f375a9f"
 HEP_KEY = "71ffeae1a9a2402c944d84c54f8ffddc"
 HEP_SECRET = "2d66e7f3dd4445dbb6791b56fadcd2dc"
