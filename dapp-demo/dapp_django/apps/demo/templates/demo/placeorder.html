@@ -1,16 +1,16 @@
 {% extends "base.html" %}
 {% block content %}
     {% if order %}
-      <img src="{{ order.order_img }}"/>
-      <p>order name: {{ order.ordername }}</p>
-      <p>order number: {{ order.ordernumber }}</p>
-      <p>order price: {{ order.total_price }}{{ order.price_currency }}</p>
-      <p id="tip">上链成功</p>
-      <button id="bt-proof" onclick="placeorder();">上链</button>
-      <button id="bt-proof-h5" onclick="h5proof();">上链H5</button>
-      <div id="proof-qrcode"></div>
+        <p class="row order-head"><img src="{{ order.order_img }}" style="width: 100%"/></p>
+        <p class="text-center word">order name: {{ order.ordername }}</p>
+        <p class="text-center word">order number: {{ order.ordernumber }}</p>
+        <p class="text-center word">order price: {{ order.total_price }}{{ order.price_currency }}</p>
+        <p class="text-center word" id="tip">上链成功</p>
+        <button class="btn btn-primary col-lg-offset-4 col-lg-4 col-md-offset-4 col-md-4 col-sm-offset-4 col-sm-4 col-xs-offset-4 col-xs-4" id="bt-proof" onclick="placeorder();">上链</button>
+        <button class="btn btn-primary col-lg-offset-4 col-lg-4 col-md-offset-4 col-md-4 col-sm-offset-4 col-sm-4 col-xs-offset-4 col-xs-4" id="bt-proof-h5" onclick="h5proof();">上链H5</button>
+        <div id="proof-qrcode" class="row text-center" style="margin-left: auto;margin-right: auto;"></div>
     {% else %}
-        <p>暂无商品</p>
+        <p class="text-center word">暂无商品</p>
     {% endif %}
 {% endblock %}
 
