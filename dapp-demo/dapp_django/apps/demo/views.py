@@ -10,7 +10,7 @@ from dapp_django.utils import http
 from django.conf import settings
 from django.shortcuts import render
 from hep_rest_api import utils
-from hep_rest_api.scenarios.proof import OrderProof
+from hep_rest_api.scenarios.proof import OrderProof, Order
 from .models import LoginModel, HepProfileModel, PayModel, ProofModel
 
 def index(request):
@@ -247,23 +247,7 @@ def request_proof(request):
         # todo: add proof field.
         pay_model = PayModel.objects.last()
         txid = pay_model.txid
-        order_content = OrderProof(order_number=uuid.uuid4().hex,
-                                   price_currency="CNY",
-                                   total_price="100",
-                                   seller=user.newid,
-                                   customer=user.newid,
-                                   broker=user.newid,
-                                   description="description",
-                                   chain_txid=None)
-        order_content.add_order_item(
-            order_item_number=uuid.uuid4().hex,
-            order_item_quantity=1,
-            price="10",
-            price_currency="NEW",
-            thing_name="pingguo",
-            thing_id=uuid.uuid4().hex,
-            thing_type='product'
-        )
+        order_content = _get_proof_content(user.newid)
         proof_qr_str = services.hep_proof(order_content.to_dict(), proof_session_id)
         pay_info = {
             'proof_qr_str': proof_qr_str,
@@ -288,24 +272,7 @@ def get_proof_hash(request):
         pay_model = PayModel.objects.last()
         txid = pay_model.txid
         proof_session_id = uuid.uuid4().hex
-        order_content = OrderProof(order_number=uuid.uuid4().hex,
-                                   price_currency="NEW",
-                                   total_price="100",
-                                   seller=newid,
-                                   customer=newid,
-                                   broker=newid,
-                                   description="description",
-                                   chain_txid=txid)
-        print("txid:" + txid)
-        order_content.add_order_item(
-            order_item_number=uuid.uuid4().hex,
-            order_item_quantity=1,
-            price="10",
-            price_currency="NEW",
-            thing_name="pingguo",
-            thing_id=uuid.uuid4().hex,
-            thing_type='product'
-        )
+        order_content = _get_proof_content(newid)
         proof_hash = services.get_proof_hash(order_content.to_dict(), proof_session_id, os)
         client_params = {
             'action': settings.ACTION_PROOF_SUBMIT,
@@ -317,6 +284,15 @@ def get_proof_hash(request):
     except Exception as e:
         logger.exception("get proof hash error:%s" % str(e))
         return http.JsonErrorResponse(error_message=str(e))
+
+
+def _get_proof_content(newid):
+    order = Order(uuid.uuid4().hex, "deacription", "30", "CNY", newid, newid)
+    order.add_order_item(uuid.uuid4().hex, 1, "10", "CNY", "pingguo", uuid.uuid4().hex)
+    order.add_order_item(uuid.uuid4().hex, 2, "20", "CNY", "xiangjiao", uuid.uuid4().hex)
+    order_content = OrderProof("30", "CNY", newid)
+    order_content.add_order(order.to_dict())
+    return order_content
 
 
 def get_client_login(request):
@@ -397,23 +373,7 @@ def request_proof_h5(request):
         # todo: add proof field.
         pay_model = PayModel.objects.last()
         txid = pay_model.txid
-        order_content = OrderProof(order_number=uuid.uuid4().hex,
-                                   price_currency="NEW",
-                                   total_price="100",
-                                   seller=user.newid,
-                                   customer=user.newid,
-                                   broker=user.newid,
-                                   description="description",
-                                   chain_txid=txid)
-        order_content.add_order_item(
-            order_item_number=uuid.uuid4().hex,
-            order_item_quantity=1,
-            price="10",
-            price_currency="NEW",
-            thing_name="pingguo",
-            thing_id=uuid.uuid4().hex,
-            thing_type='product'
-        )
+        order_content = _get_proof_content(user.newid)
         proof_hash = services.get_proof_hash(order_content.to_dict(), proof_session_id)
         client_params = {
             'uuid': proof_session_id,
