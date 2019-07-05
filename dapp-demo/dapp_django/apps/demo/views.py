@@ -287,11 +287,21 @@ def get_proof_hash(request):
 
 
 def _get_proof_content(newid):
-    order = Order(uuid.uuid4().hex, "deacription", "30", "CNY", newid, newid)
+    order = Order(uuid.uuid4().hex, "deacription1", "150", "CNY", newid, newid)
     order.add_order_item(uuid.uuid4().hex, 1, "10", "CNY", "pingguo", uuid.uuid4().hex)
     order.add_order_item(uuid.uuid4().hex, 2, "20", "CNY", "xiangjiao", uuid.uuid4().hex)
-    order_content = OrderProof("30", "CNY", newid)
+    order.add_order_item(uuid.uuid4().hex, 2, "50", "CNY", "li", uuid.uuid4().hex)
+    order.add_order_item(uuid.uuid4().hex, 2, "70", "CNY", "你好", uuid.uuid4().hex)
+
+    order1 = Order(uuid.uuid4().hex, "description2", "150", "CNY", newid, newid)
+    order1.add_order_item(uuid.uuid4().hex, 1, "10", "CNY", "order2", uuid.uuid4().hex)
+    order1.add_order_item(uuid.uuid4().hex, 2, "20", "CNY", "order2xiangjiao", uuid.uuid4().hex)
+    order1.add_order_item(uuid.uuid4().hex, 2, "50", "CNY", "order2li", uuid.uuid4().hex)
+    order1.add_order_item(uuid.uuid4().hex, 2, "70", "CNY", "order2你好", uuid.uuid4().hex)
+
+    order_content = OrderProof("300", "CNY", newid)
     order_content.add_order(order.to_dict())
+    order_content.add_order(order1.to_dict())
     return order_content
 
 
@@ -374,6 +384,7 @@ def request_proof_h5(request):
         pay_model = PayModel.objects.last()
         txid = pay_model.txid
         order_content = _get_proof_content(user.newid)
+        print(order_content.to_dict())
         proof_hash = services.get_proof_hash(order_content.to_dict(), proof_session_id)
         client_params = {
             'uuid': proof_session_id,
