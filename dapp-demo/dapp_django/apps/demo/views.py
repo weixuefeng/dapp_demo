@@ -464,8 +464,8 @@ def _get_client_params(data, os=None):
         dapp_id = settings.DAPP_ID_ANDROID
         private_key_path = settings.DAPP_ID_ANDROID_PRIVATE_PATH
     elif os == "ios":
-        dapp_id = settings.DAPP_ID_IOS
-        private_key_path = settings.DAPP_ID_IOS_PRIVATE_PATH
+        dapp_id = settings.DAPP_ID_ANDROID
+        private_key_path = settings.DAPP_ID_ANDROID_PRIVATE_PATH
     else:
         dapp_id = settings.HEP_ID
         private_key_path = settings.PRIVATE_KEY_PATH
