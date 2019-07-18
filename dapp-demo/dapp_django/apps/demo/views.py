@@ -88,7 +88,7 @@ def request_pay(request):
             'uuid': pay_session_id,
             'description': '你好',
             'price_currency': 'NEW',
-            'total_price': '100',
+            'total_price': '0.01',
             'order_number': order_number,
             'seller': user.newid,
             'customer': user.newid,
@@ -122,7 +122,7 @@ def request_pay_h5(request):
             'action': settings.ACTION_PAY,
             'description': 'Pay description',
             'price_currency': 'NEW',
-            'total_price': "1",
+            'total_price': "0.01",
             'order_number': uuid.uuid4().hex,
             'seller': newid,
             'customer': newid,
@@ -287,19 +287,19 @@ def get_proof_hash(request):
 
 
 def _get_proof_content(newid):
-    order = Order(uuid.uuid4().hex, "deacription1", "150", "CNY", newid, newid)
-    order.add_order_item(uuid.uuid4().hex, 1, "10", "CNY", "pingguo", uuid.uuid4().hex)
-    order.add_order_item(uuid.uuid4().hex, 2, "20", "CNY", "xiangjiao", uuid.uuid4().hex)
-    order.add_order_item(uuid.uuid4().hex, 2, "50", "CNY", "li", uuid.uuid4().hex)
-    order.add_order_item(uuid.uuid4().hex, 2, "70", "CNY", "你好", uuid.uuid4().hex)
+    order = Order(uuid.uuid4().hex, "deacription1", "0.04", "CNY", newid, newid)
+    order.add_order_item(uuid.uuid4().hex, 1, "0.01", "CNY", "pingguo", uuid.uuid4().hex)
+    order.add_order_item(uuid.uuid4().hex, 2, "0.01", "CNY", "xiangjiao", uuid.uuid4().hex)
+    order.add_order_item(uuid.uuid4().hex, 2, "0.01", "CNY", "li", uuid.uuid4().hex)
+    order.add_order_item(uuid.uuid4().hex, 2, "0.01", "CNY", "你好", uuid.uuid4().hex)
 
-    order1 = Order(uuid.uuid4().hex, "description2", "150", "CNY", newid, newid)
-    order1.add_order_item(uuid.uuid4().hex, 1, "10", "CNY", "order2", uuid.uuid4().hex)
-    order1.add_order_item(uuid.uuid4().hex, 2, "20", "CNY", "order2xiangjiao", uuid.uuid4().hex)
-    order1.add_order_item(uuid.uuid4().hex, 2, "50", "CNY", "order2li", uuid.uuid4().hex)
-    order1.add_order_item(uuid.uuid4().hex, 2, "70", "CNY", "order2你好", uuid.uuid4().hex)
+    order1 = Order(uuid.uuid4().hex, "description2", "0.04", "CNY", newid, newid)
+    order1.add_order_item(uuid.uuid4().hex, 1, "0.01", "CNY", "order2", uuid.uuid4().hex)
+    order1.add_order_item(uuid.uuid4().hex, 2, "0.01", "CNY", "order2xiangjiao", uuid.uuid4().hex)
+    order1.add_order_item(uuid.uuid4().hex, 2, "0.01", "CNY", "order2li", uuid.uuid4().hex)
+    order1.add_order_item(uuid.uuid4().hex, 2, "0.01", "CNY", "order2你好", uuid.uuid4().hex)
 
-    order_content = OrderProof("300", "CNY", newid)
+    order_content = OrderProof("0.08", "CNY", newid)
     order_content.add_order(order.to_dict())
     order_content.add_order(order1.to_dict())
     return order_content
