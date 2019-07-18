@@ -428,13 +428,15 @@ def receive_proof(request):
         if proof_status:
             print(proof_status.proof_status)
             print(proof_status.proof_hash)
-        proof_model.txid = uuid.uuid4().hex
-        proof_model.save()
-        login_model = LoginModel.objects.filter(login_id=proof_model.uuid).first()
-        if login_model:
-            login_model.status = codes.StatusCode.AVAILABLE.value
-            login_model.save()
-        return http.JsonSuccessResponse()
+            proof_model.txid = uuid.uuid4().hex
+            proof_model.save()
+            login_model = LoginModel.objects.filter(login_id=proof_model.uuid).first()
+            if login_model:
+                login_model.status = codes.StatusCode.AVAILABLE.value
+                login_model.save()
+            return http.JsonSuccessResponse()
+        else:
+            return http.JsonErrorResponse(error_message="verify_proof error")
     except Exception as e:
         logger.exception("receive proof error:%s" % str(e))
         return http.JsonErrorResponse()
