@@ -124,8 +124,10 @@ def verify_pay(params):
 
 
 def hep_proof(content, uuid):
+    print('uuid: %s' %(uuid))
     proof_response = _get_proof_helper().generate_proof_request(content, uuid=uuid)
     proof_qr_str = _get_proof_helper().generate_qrcode_string(proof_response.proof_hash)
+    print('proof hash: %s' % (proof_response.proof_hash))
     return proof_qr_str
 
 
