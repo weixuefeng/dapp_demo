@@ -28,7 +28,7 @@ def uni_str(a, encoding=None):
     elif isinstance(a, str) or (hasattr(a, '__str__') and callable(getattr(a, '__str__'))):
         if getattr(a, '__str__'):
             a = str(a)
-        return str(a, encoding)
+        return a.encode('utf-8')
     else:
         return a
 
