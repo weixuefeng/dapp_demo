@@ -494,7 +494,7 @@ def _get_client_params(data, os=None):
 
 def _get_body(request):
     content_type = request.META.get('CONTENT_TYPE') or request.META.get('HTTP_CONTENT_TYPE')
-    if content_type.find('application/json') > -1:
+    if content_type and content_type.find('application/json') > -1:
         data = json.loads(request.body)
         if data:
             request.POST = data
