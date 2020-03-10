@@ -70,7 +70,56 @@ function h5pay() {
         }
     });
 }
+function requestSignMessage() {
+    let url = "/get/client/sign/message/";
+    $.ajax({
+        url: url,
+        async: true,
+        type: 'post',
+        data: {'message': 'message'},
+        success: function (res) {
+            if(res.error_code === 1) {
+                if(hep) {
+                    let params = res.result;
+                    hep.sign.message(params, function(response) {
+                        alert(response.message);
+                    });
+                } else {
+                    alert("hep is not inject");
+                }
+            }
+        }
+    });
+}
 
+function requestSignTransaction() {
+    let url = "/get/client/sign/transaction/";
+    $.ajax({
+        url: url,
+        async: true,
+        type: 'post',
+        data: {'amount': '10',
+                'from': '0x6d0b88Be60F049C5702B8279525177733E362c9A',
+                'to': '0x6d0b88Be60F049C5702B8279525177733E362c9A',
+                'data': '0x6d0b88Be60F049C5702B8279525177733E362c9A',
+                'gas_limit': '0x0',
+                'gas_price': '0x0',
+                'transaction_count': '1'
+                },
+        success: function (res) {
+            if(res.error_code === 1) {
+                if(hep) {
+                    let params = res.result;
+                    hep.sign.transaction(params, function(response) {
+                        alert(response.message);
+                    });
+                } else {
+                    alert("hep is not inject");
+                }
+            }
+        }
+    });
+}
 function h5proof() {
     let url = "/request/proof/h5/";
     $.ajax({
