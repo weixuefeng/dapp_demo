@@ -34,5 +34,5 @@ urlpatterns = [
     path('get/client/login/', views.get_client_login, name="get_client_login"),
     path('get/client/pay/', views.get_client_pay, name="get_client_pay"),
     path('get/client/sign/message/', views.get_client_sign_message, name="get_client_sign_message"),
-    path('get/client/sign/transaction/', views.get_client_sign_transaction, name="get_client_sign_message")
+    path('get/client/sign/transaction/', views.get_client_sign_transaction, name="get_client_sign_transaction")
 ]
