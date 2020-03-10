@@ -509,6 +509,7 @@ def get_client_sign_message(request):
         sign_message_data = {
             'message': message,
             'action': settings.ACTION_SIGN_MESSAGE,
+            'uuid': uuid.uuid4().hex
         }
         sign_message_data = _get_client_params(sign_message_data)
         return http.JsonSuccessResponse(data=sign_message_data)
@@ -521,6 +522,7 @@ def get_client_sign_transaction(request):
     try:
         body = _get_body(request)
         sign_transaction_data = {
+            'uuid': uuid.uuid4().hex,
             'action': settings.ACTION_SIGN_TRANSACTION,
             'amount': body.get('amount'),
             'from': body.get('from'),
