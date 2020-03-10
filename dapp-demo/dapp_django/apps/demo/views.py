@@ -182,7 +182,7 @@ def receive_profile(request):
 
 def receive_pay(request):
     try:
-        content_type = request.META.get('CONTENT_TYPE') or request.META.get['HTTP_CONTENT_TYPE']
+        content_type = request.META.get('CONTENT_TYPE') or request.META.get('HTTP_CONTENT_TYPE')
         if content_type.find('application/json') > -1:
             data = json.loads(request.body)
             if data:
@@ -493,7 +493,7 @@ def _get_client_params(data, os=None):
 
 
 def _get_body(request):
-    content_type = request.META.get('CONTENT_TYPE') or request.META.get['HTTP_CONTENT_TYPE']
+    content_type = request.META.get('CONTENT_TYPE') or request.META.get('HTTP_CONTENT_TYPE')
     if content_type.find('application/json') > -1:
         data = json.loads(request.body)
         if data:
