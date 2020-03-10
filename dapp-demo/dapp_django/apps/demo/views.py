@@ -510,6 +510,7 @@ def get_client_sign_message(request):
             'message': message,
             'action': settings.ACTION_SIGN_MESSAGE,
         }
+        sign_message_data = _get_client_params(sign_message_data)
         return http.JsonSuccessResponse(data=sign_message_data)
     except Exception as e:
         logger.exception("get_client_sign_message error:%s" % str(e))
@@ -529,6 +530,7 @@ def get_client_sign_transaction(request):
             'gas_limit': body.get('gas_limit'),
             'data': body.get('data')
         }
+        sign_transaction_data = _get_client_params(sign_transaction_data)
         return http.JsonSuccessResponse(data=sign_transaction_data)
     except Exception as e:
         logger.exception("get_client_sign_transaction error:%s" % str(e))
