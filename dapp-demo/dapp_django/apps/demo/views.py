@@ -13,6 +13,7 @@ from hep_rest_api import utils
 from hep_rest_api.scenarios.proof import OrderProof, Order
 from .models import LoginModel, HepProfileModel, PayModel, ProofModel
 
+
 def index(request):
     return render(request, "demo/index.html")
 
@@ -416,12 +417,7 @@ def query_proof(request):
 
 def receive_proof(request):
     try:
-        content_type = request.META.get('CONTENT_TYPE') or request.META.get['HTTP_CONTENT_TYPE']
-        if content_type.find('application/json') > -1:
-            data = json.loads(request.body)
-            if data:
-                request.POST = data
-        body = request.POST
+        body = _get_body(request)
         proof_model = ProofModel()
         proof_model.uuid = body.get('uuid')
         proof_status = services.verify_proof(body)
@@ -494,6 +490,50 @@ def _get_client_params(data, os=None):
         s = '0' * y + s
     data['signature'] = '0x' + r + s
     return data
+
+
+def _get_body(request):
+    content_type = request.META.get('CONTENT_TYPE') or request.META.get['HTTP_CONTENT_TYPE']
+    if content_type.find('application/json') > -1:
+        data = json.loads(request.body)
+        if data:
+            request.POST = data
+    body = request.POST
+    return body
+
+
+def get_client_sign_message(request):
+    try:
+        body = _get_body(request)
+        message = body.get('message')
+        sign_message_data = {
+            'message': message,
+            'action': settings.ACTION_SIGN_MESSAGE,
+        }
+        return http.JsonSuccessResponse(data=sign_message_data)
+    except Exception as e:
+        logger.exception("get_client_sign_message error:%s" % str(e))
+        return http.JsonErrorResponse()
+
+
+def get_client_sign_transaction(request):
+    try:
+        body = _get_body(request)
+        sign_transaction_data = {
+            'action': settings.ACTION_SIGN_TRANSACTION,
+            'amount': body.get('amount'),
+            'from': body.get('from'),
+            'to': body.get('to'),
+            'transaction_count': body.get('transaction_count'),
+            'gas_price': body.get('gas_price'),
+            'gas_limit': body.get('gas_limit'),
+            'data': body.get('data')
+        }
+        return http.JsonSuccessResponse(data=sign_transaction_data)
+    except Exception as e:
+        logger.exception("get_client_sign_transaction error:%s" % str(e))
+        return http.JsonErrorResponse()
+
 
 
 
