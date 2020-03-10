@@ -13,6 +13,7 @@ from hep_rest_api import utils
 from hep_rest_api.scenarios.proof import OrderProof, Order
 from .models import LoginModel, HepProfileModel, PayModel, ProofModel
 
+
 def index(request):
     return render(request, "demo/index.html")
 
