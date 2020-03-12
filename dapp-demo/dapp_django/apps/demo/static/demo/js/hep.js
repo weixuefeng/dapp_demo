@@ -99,11 +99,11 @@ function requestSignTransaction() {
         async: true,
         type: 'post',
         data: {'amount': '10',
-                'from': '0x6d0b88Be60F049C5702B8279525177733E362c9A',
-                'to': '0x6d0b88Be60F049C5702B8279525177733E362c9A',
-                'data': '0x6d0b88Be60F049C5702B8279525177733E362c9A',
-                'gas_limit': '0x0',
-                'gas_price': '0x0',
+                'from': '0xcf25cd19edd8364f12ccf8968a6e8bfcd7ca4604',
+                'to': '0xcf25cd19edd8364f12ccf8968a6e8bfcd7ca4604',
+                'data': '0xcf25cd19edd8364f12ccf8968a6e8bfcd7ca4604',
+                'gas_limit': '21000000',
+                'gas_price': '100',
                 'transaction_count': '1'
                 },
         success: function (res) {
