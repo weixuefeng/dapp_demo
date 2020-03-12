@@ -471,7 +471,7 @@ def _get_client_params(data, os=None):
         'dapp_id': dapp_id,
         'protocol': settings.HEP_PROTOCOL,
         'version': settings.HEP_PROTOCOL_VERSION,
-        'ts': int(datetime.datetime.now().timestamp()),
+        'ts': str(int(datetime.datetime.now().timestamp())),
         'nonce': uuid.uuid4().hex,
         'sign_type': settings.SIGN_TYPE,
     }
