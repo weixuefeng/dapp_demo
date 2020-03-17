@@ -83,9 +83,9 @@ function requestSignMessage() {
                     let params = res.result;
                     hep.sign.message(params, function(response) {
                         if(response.status_code === 200) {
-                            $("sign-message-result").val("签名结果:" + response.result)
+                            document.getElementById("sign-message-result").textContent = "签名信息结果:" + response.result;
                         } else {
-                            $("sign-message-result").val("签名错误:" + response.message)
+                            document.getElementById("sign-message-result").textContent = "签名信息错误:" + response.message;
                         }
                     });
                 } else {
@@ -116,9 +116,9 @@ function requestSignTransaction() {
                     let params = res.result;
                     hep.sign.transaction(params, function(response) {
                         if(response.status_code === 200) {
-                            $("#transaction-result").val("签署交易结果:" + response.result)
+                            document.getElementById("transaction-result").textContent = "签署交易结果:" + response.result;
                         } else {
-                            $("#transaction-result").val("签署交易错误:" + response.message)
+                            document.getElementById("transaction-result").textContent = "签署交易错误:" + response.message;
                         }
                     });
                 } else {

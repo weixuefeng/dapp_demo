@@ -4,33 +4,33 @@
     <form class="form-row">
         <div class="form-group">
             <label class="control-label">From地址</label>
-            <p>{{ user.address }}</p>
+            <input id="input-from-address" class="form-control" type="text" value="{{ user.address }}">
         </div>
     <div class="form-group">
             <label class="control-label">To地址</label>
-            <input id="input-to-address" class="form-control" type="text" placeholder="To地址">
+            <input id="input-to-address" class="form-control" type="text" value="{{ user.address }}">
         </div>
         <div class="form-group">
             <label class="control-label">Amount(金额)</label>
-            <input id="input-amount" class="form-control" type="text" placeholder="Amount(金额)">
+            <input id="input-amount" class="form-control" type="text" value="100">
         </div>
     <div class="form-group">
             <label class="control-label">GasPrice</label>
-            <input id="input-gas-price" class="form-control" type="text" placeholder="GasPrice">
+            <input id="input-gas-price" class="form-control" type="text" value="1000000">
         </div>
     <div class="form-group">
             <label class="control-label">GasLimit</label>
-            <input id="input-gas-limit" class="form-control" type="text" placeholder="GasLimit">
+            <input id="input-gas-limit" class="form-control" type="text" value="2100000000">
         </div>
     <div class="form-group">
             <label class="control-label">Nonce</label>
-            <input id="input-transaction-count" class="form-control" type="text" placeholder="Nonce 值">
+            <input id="input-transaction-count" class="form-control" type="text" value="10">
         </div>
     <div class="form-group">
             <label class="control-label">Data</label>
-            <input id="input-data" class="form-control" type="text" placeholder="Data数据部分">
+            <input id="input-data" class="form-control" type="text" value="0x123123">
         </div>
-            <button class="btn word btn-primary col-lg-4 col-md-4 col-sm-4 col-xs-4" onclick="requestSignTransaction()">签署交易</button>
+            <button  type="button" class="btn word btn-primary col-lg-4 col-md-4 col-sm-4 col-xs-4" onclick="requestSignTransaction()">签署交易</button>
     </form>
     <p id="transaction-result"></p>
 {% endblock %}
