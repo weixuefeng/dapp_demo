@@ -4,4 +4,4 @@ __version__ = ''
 __doc__ = ''
 from .config.settings_label import *
 from .config.common_settings import *
-STATIC_DEFAULT_VERSION = 2
+STATIC_DEFAULT_VERSION = 3

@@ -82,7 +82,11 @@ function requestSignMessage() {
                 if(hep) {
                     let params = res.result;
                     hep.sign.message(params, function(response) {
-                        alert("签名结果:" + response.result);
+                        if(response.status_code === 200) {
+                            $("sign-message-result").val("签名结果:" + response.result)
+                        } else {
+                            $("sign-message-result").val("签名错误:" + response.message)
+                        }
                     });
                 } else {
                     alert("hep is not inject");
@@ -111,7 +115,11 @@ function requestSignTransaction() {
                 if(hep) {
                     let params = res.result;
                     hep.sign.transaction(params, function(response) {
-                        alert("签署交易结果:" + response.result);
+                        if(response.status_code === 200) {
+                            $("#transaction-result").val("签署交易结果:" + response.result)
+                        } else {
+                            $("#transaction-result").val("签署交易错误:" + response.message)
+                        }
                     });
                 } else {
                     alert("hep is not inject");
