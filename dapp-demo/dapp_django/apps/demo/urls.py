@@ -5,12 +5,13 @@ __doc__ = ''
 
 from django.urls import path
 from . import views
-
 urlpatterns = [
     path('', views.index, name="index"),
     path('user/login', views.request_login, name="request_login"),
     path('user/query', views.query_profile, name="query_profile"),
     path('user', views.user_center, name="user_center"),
+    path('sign/message', views.show_sign_message, name="sign_message"),
+    path('sign/transaction', views.show_sign_transaction, name="sign_transaction"),
 
     path('receive/pay/', views.receive_pay, name="receive_pay"),
     path('receive/proof/', views.receive_proof, name="receive_proof"),

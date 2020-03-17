@@ -4,6 +4,20 @@
   <p class="text-center word">name: {{ user.name }}</p>
   <p class="text-center word">newid: {{ user.newid }}</p>
   <p class="text-center word "><img src="{{ user.avatar }}" style="width: 100%" /></p>
-  <p class="text-center word"><a class="text-center" href="order">浏览商品</a></p>
-
+  <button class="btn word btn-primary col-lg-offset-4 col-lg-4 col-md-offset-4 col-md-4 col-sm-offset-4 col-sm-4 col-xs-offset-4 col-xs-4" onclick="openOrder();">浏览商品</button>
+  <button class="btn word btn-primary col-lg-offset-4 col-lg-4 col-md-offset-4 col-md-4 col-sm-offset-4 col-sm-4 col-xs-offset-4 col-xs-4" id="bt-sign-message" onclick="openSignMessage();">请求签名</button>
+  <button class="btn word btn-primary col-lg-offset-4 col-lg-4 col-md-offset-4 col-md-4 col-sm-offset-4 col-sm-4 col-xs-offset-4 col-xs-4" id="bt-sign-transaction" onclick="openSignTransaction();">请求签署交易</button>
+{% endblock %}
+{% block script %}
+    <script type="text/javascript">
+        function openOrder() {
+            window.location.href = "order";
+        }
+        function openSignMessage() {
+            window.location.href = "sign/message";
+        }
+        function openSignTransaction() {
+            window.location.href = "sign/transaction";
+        }
+    </script>
 {% endblock %}

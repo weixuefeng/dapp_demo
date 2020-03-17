@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block content %}
+    <h3>请求签名信息</h3>
+    <form class="form-row">
+        <div class="form-group">
+            <label class="control-label">签名信息</label>
+            <input id="input-sign-message" class="form-control" type="text" placeholder="请输入需要签名的信息">
+            <button class="btn word btn-primary col-lg-4 col-md-4 col-sm-4 col-xs-4" onclick="requestSignMessage()">签名</button>
+        </div>
+    </form>
+{% endblock %}
+
+{% block script %}
+  <script type="text/javascript">
+
+  </script>
+{% endblock %}

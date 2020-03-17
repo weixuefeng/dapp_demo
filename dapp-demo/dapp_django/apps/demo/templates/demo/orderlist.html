@@ -7,8 +7,6 @@
       <p class="text-center word">order price: {{ order.total_price }}{{ order.price_currency }}</p>
       <button class="btn btn-primary col-lg-offset-4 col-lg-4 col-md-offset-4 col-md-4 col-sm-offset-4 col-sm-4 col-xs-offset-4 col-xs-4" id="bt-buy" onclick="buy();">购买</button>
       <button class="btn btn-primary col-lg-offset-4 col-lg-4 col-md-offset-4 col-md-4 col-sm-offset-4 col-sm-4 col-xs-offset-4 col-xs-4" id="bt-buy-h5" onclick="h5pay();">购买h5</button>
-      <button class="btn btn-primary col-lg-offset-4 col-lg-4 col-md-offset-4 col-md-4 col-sm-offset-4 col-sm-4 col-xs-offset-4 col-xs-4" id="bt-sign-message" onclick="requestSignMessage();">请求签名</button>
-      <button class="btn btn-primary col-lg-offset-4 col-lg-4 col-md-offset-4 col-md-4 col-sm-offset-4 col-sm-4 col-xs-offset-4 col-xs-4" id="bt-sign-transaction" onclick="requestSignTransaction();">请求签署交易</button>
       <div id="pay-qrcode" class="row text-center" style="margin-left: auto;margin-right: auto;"></div>
     {% else %}
         <p class="text-center word">暂无商品</p>

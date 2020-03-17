@@ -1,19 +1,22 @@
 {% load static %}
+{% load utils %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <title>Dapp Demo</title>
-  <script src="{% static 'demo/js/qrcode.min.js' %}"></script>
+  <script src="{% version 'demo/js/qrcode.min.js' %}"></script>
   <script src="{% static 'demo/js/jquery-2.1.4.min.js' %}"></script>
-  <script src="{% static 'demo/js/hep.js' %}"></script>
+  <script src="{% version 'demo/js/hep.js' %}"></script>
   <script src="{% static 'demo/js/bootstrap.min.js' %}"></script>
   <link href="{% static 'demo/css/style.css' %}" rel="stylesheet" />
   <link href="{% static 'demo/css/bootstrap.min.css' %}" rel="stylesheet" />
 </head>
 <body>
-  {% block content %}
+<div class="container">
+    {% block content %}
   {% endblock %}
+</div>
 
   {% block script %}
   {% endblock %}
