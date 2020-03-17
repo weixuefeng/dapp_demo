@@ -82,7 +82,7 @@ function requestSignMessage() {
                 if(hep) {
                     let params = res.result;
                     hep.sign.message(params, function(response) {
-                        alert(response.message);
+                        alert("签名结果:" + response.result);
                     });
                 } else {
                     alert("hep is not inject");
@@ -111,7 +111,7 @@ function requestSignTransaction() {
                 if(hep) {
                     let params = res.result;
                     hep.sign.transaction(params, function(response) {
-                        alert(response.message);
+                        alert("签署交易结果:" + response.result);
                     });
                 } else {
                     alert("hep is not inject");

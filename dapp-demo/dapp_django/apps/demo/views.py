@@ -74,7 +74,7 @@ def show_sign_transaction(request):
     try:
         login_id = request.session['uuid']
         user = HepProfileModel.objects.filter(uuid=login_id).first()
-        return render(request, "demo/sign_transaction.html", {'user': {user}})
+        return render(request, "demo/sign_transaction.html", {'user': user})
     except Exception as e:
         logger.exception("sign transaction error:%s" % str(e))
         return http.JsonErrorResponse()
